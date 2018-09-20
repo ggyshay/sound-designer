@@ -1,5 +1,5 @@
 .card-holder{
-    position: absolute;
+    position: fixed;
 }
 
 .card {
@@ -23,29 +23,6 @@
     margin: 0;  
 }
 
-.connector-left{
-    position: absolute;
-    background-color: #DA0027;
-    border-radius: 100%;
-    width:1em;
-    height:1em;
-    top:3em;
-    left: -0.5em;
-    box-sizing: border-box;
-    border: 2px solid #202020
-}
-
-.connector-right {
-    position: absolute;
-    background-color: #DA0027;
-    border-radius: 100%;
-    width:1em;
-    height:1em;
-    top:3em;
-    left: 11.5em;
-    box-sizing: border-box;
-    border: 2px solid #202020
-}
 
 .card-display {
     background-color: #202020;

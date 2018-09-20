@@ -1,5 +1,5 @@
-.connector {
-    position: absolute;
+.connector{
+    position: fixed;
     background-color: #DA0027;
     border-radius: 100%;
     width:1em;
