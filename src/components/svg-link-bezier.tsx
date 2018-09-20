@@ -44,7 +44,7 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
                         <path
                             d={instructions}
                             fill="none"
-                            stroke="green"
+                            stroke="#00DACD"
                             strokeWidth={5}
                         />
                     }
@@ -55,6 +55,7 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
                         onConnectorDetected={this.onConnectorDetected}
                         onConnectorLost={this.onConnectorLost}
                         currentConnection={{ Inp, Outp }}
+                        connectionCallback={this.cleanConnection}
                     />
                 </div>
             </div>

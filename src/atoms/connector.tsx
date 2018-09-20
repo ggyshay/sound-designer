@@ -21,22 +21,34 @@ export interface ConnectorProps {
 export class Connector extends React.Component<ConnectorProps, any>{
     public metadata = null;
     render() {
-        const { dx, dy } = this.getSVGSize();
+        const { dx, dy, x0, y0 } = this.getSVGSize();
         return (
             <div>
                 <div className="connector"
-                    style={{ left: this.props.Position.x, top: this.props.Position.y }}
+                    style={{ left: this.props.Position.x, top: this.props.Position.y, zIndex: 100 }}
                     onMouseDown={e => this.handleConnectorDrag(e)}
                     onMouseOver={e => this.handleConnectorDetected(e)}
-                    onMouseLeave={this.props.onConnectorLost}
+                    onMouseLeave={this.handleConnectorLost}
                 ></div>
-                <svg style={{ position: 'fixed' }} width={dx} height={dy}>
-                    {this.props.connections.map(cn => <Bezier P1={this.props.Position} P2={cn.Position} />)}
-                </svg>
+                {true &&
+                    <svg style={{ position: 'fixed', left: x0, top: y0, pointerEvents: 'none' }}
+                        width={dx} height={dy} viewBox={`0 0 ${dx} ${dy}`}>
+                        {this.props.connections.map(cn => {
+                            const bx0 = this.props.Position.x - x0 + 7, by0 = this.props.Position.y - y0 + 7,
+                                bx1 = cn.Position.x - x0 + 7, by1 = cn.Position.y - y0 + 7;
+                            return (
+                                <Bezier P1={{ x: bx0, y: by0 }} P2={{ x: bx1, y: by1 }} />)
+                        })}
+                    </svg>
+                }
+
             </div>
         );
     }
 
+    handleConnectorLost = e => {
+        this.props.onConnectorLost(e);
+    }
 
     handleConnectorDrag = (e) => {
         this.props.onConnectorDrag(this.Metadata());
@@ -49,8 +61,8 @@ export class Connector extends React.Component<ConnectorProps, any>{
     Metadata = (): ConnectorMeta => {
         return ({
             Position: {
-                x: this.props.Position.x + this.props.parentX + 7,
-                y: this.props.Position.y + this.props.parentY + 7,
+                x: this.props.Position.x + 7,
+                y: this.props.Position.y + 7
             },
             isOutp: this.props.isOutp,
             parentId: this.props.parentId,
@@ -63,7 +75,7 @@ export class Connector extends React.Component<ConnectorProps, any>{
 
     private getSVGSize = () => {
         let maxX = this.props.Position.x, maxY = this.props.Position.y,
-        minX = this.props.Position.x, minY = this.props.Position.y;
+            minX = this.props.Position.x, minY = this.props.Position.y;
 
         this.props.connections.forEach(cn => {
             maxX = cn.Position.x > maxX ? cn.Position.x : maxX;
@@ -71,6 +83,6 @@ export class Connector extends React.Component<ConnectorProps, any>{
             maxY = cn.Position.y > maxY ? cn.Position.y : maxY;
             minY = cn.Position.y < minY ? cn.Position.y : minY;
         });
-        return { dx: maxX - minX, dy: maxY - minY }
+        return { dx: maxX - minX + 32, dy: maxY - minY + 32, x0: minX, y0: minY }
     }
 }

@@ -6,18 +6,19 @@ import _ from 'lodash';
 
 export interface CardProps {
     Position: { x: number, y: number }
-    handleDragStart: (e: any, id: string) => void;
     id: string;
     onConnectorDrag: (metadata: any) => void;
     onConnectorDetected: (metadata: any) => void;
     onConnectorLost: (e: any) => void;
     connectors: ConnectorMeta[];
-    connect: { Outp: ConnectorMeta, Inp: ConnectorMeta };
+    connect: { Outp: ConnectorMeta, Inp: ConnectorMeta};
     nodes: CardNode[];
+    handleCardDrag: (e: any, id: string) => void;
+    connectionCallback: () => void;
 }
 
 export type ConnectorMeta = {
-    Position: {x: number, y: number}
+    Position: { x: number, y: number }
     id: string;
     isOutp: boolean;
     connections: ConnectorMeta[];
@@ -38,7 +39,7 @@ export class Card extends React.Component<CardProps, CardState> {
         }
     }
 
-    componentDidUpdate (){
+    componentDidUpdate() {
 
         this.updateConnectors();
         return true
@@ -69,8 +70,7 @@ export class Card extends React.Component<CardProps, CardState> {
                     )
                 })}
 
-                <div className="card" draggable
-                    onDragStart={e => this.props.handleDragStart(e, this.props.id)}>
+                <div className="card" onMouseDown={e => this.handleCardDrag(e)}>
                     <div className="card-header">
                         <p>Source</p>
                     </div>
@@ -86,6 +86,10 @@ export class Card extends React.Component<CardProps, CardState> {
         )
     }
 
+    handleCardDrag = e => {
+        this.props.handleCardDrag(e, this.props.id);
+    }
+
     updateConnectors = () => {
         // update each connector, recalculating its connections' x and y with the nodes props
         const connectors = this.state.connectors.slice(0);
@@ -97,18 +101,19 @@ export class Card extends React.Component<CardProps, CardState> {
             return cn
         });
 
-        
+
         if (this.props.connect) {
             const outCon = newConnectors.find((cn: ConnectorMeta) => cn.id === this.props.connect.Outp.id);
             const inNode = this.props.nodes.find((n: CardNode) => n.id === this.props.connect.Inp.parentId);
-            if(!inNode) return;
+            if (!inNode) return;
             const inCon = inNode.connectors.find((cn: ConnectorMeta) => cn.id === this.props.connect.Inp.id);
-            
+
             if (!this.areConnected(inCon, outCon)) {
                 outCon.connections.push(inCon);
+                this.props.connectionCallback();
             }
         }
-        if(!_.isEqual(this.state.connectors, newConnectors)){
+        if (!_.isEqual(this.state.connectors, newConnectors)) {
             this.setState({ connectors: newConnectors });
         }
     }
@@ -119,6 +124,6 @@ export class Card extends React.Component<CardProps, CardState> {
     }
 
     areConnected = (inCon: ConnectorMeta, outCon: ConnectorMeta) => {
-        return !!outCon.connections.find((cn:ConnectorMeta) => cn.id === inCon.id);
+        return !!outCon.connections.find((cn: ConnectorMeta) => cn.id === inCon.id);
     }
 }

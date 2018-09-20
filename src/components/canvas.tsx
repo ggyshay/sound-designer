@@ -8,6 +8,7 @@ export interface CanvasProps {
     onConnectorDetected: (metadata: any) => void;
     onConnectorLost: (e: any) => void;
     currentConnection: { Inp: any, Outp: any };
+    connectionCallback: () => void;
 }
 
 export interface CardNode {
@@ -19,6 +20,8 @@ export interface CardNode {
 
 export interface CanvasState {
     nodes: CardNode[];
+    draggingId: string | null;
+    draggingPoint: { x: number, y: number } | null;
 }
 
 export class Canvas extends React.Component<CanvasProps, CanvasState> {
@@ -26,6 +29,8 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         super(props);
         this.state = {
             nodes: [],
+            draggingId: null,
+            draggingPoint: null
         };
     }
 
@@ -33,14 +38,16 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         const Outp = this.props.currentConnection.Outp;
         const Inp = this.props.currentConnection.Inp;
         return (
-            <div className="App" onDragOver={(e) => this.handleDragOver(e)} onDrop={e => this.handleDrop(e)}>
+            <div className="App" onDragOver={(e) => this.handleDragOver(e)} onDrop={e => this.handleDrop(e)}
+                onMouseUp={this.handleMouseUp}>
                 {this.state.nodes.map((n: CardNode) => {
                     return (<Card
                         Position={{ x: n.x, y: n.y }}
                         connectors={n.connectors}
                         connect={Outp && Inp && (n.id === Outp.parentId ? { Outp, Inp } : null)}
+                        connectionCallback={this.props.connectionCallback}
                         nodes={this.state.nodes}
-                        handleDragStart={this.handleCardDrag}
+                        handleCardDrag={this.handleCardDrag}
                         onConnectorDrag={this.props.onConnectorDrag}
                         onConnectorDetected={this.props.onConnectorDetected}
                         onConnectorLost={this.props.onConnectorLost}
@@ -54,25 +61,32 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         );
     }
 
-    handleCardDrag = (e, id) => {
-        e.dataTransfer.setData("id", id);
-        e.dataTransfer.setData("movement-type", "move")
-        e.dataTransfer.setData("drag-point", JSON.stringify({ x: e.clientX, y: e.clientY }));
+    handleCardDrag = (e: MouseEvent, id: string) => {
+        document.addEventListener('mousemove', this.onMouseMove);
+        this.setState({ draggingId: id, draggingPoint: { x: e.pageX, y: e.pageY } });
     }
 
-    handleCardDrop = e => {
-        const id = e.dataTransfer.getData("id");
-        const nodes = this.state.nodes.slice(0);
-        const result = nodes.find((n: CardNode) => n.id === id);
-        const startPoint = JSON.parse(e.dataTransfer.getData("drag-point"));
+    onMouseMove = (e: MouseEvent) => {
+        const nodes = this.state.nodes.slice(0)
+        const node = this.getNodeWithId(this.state.draggingId, nodes)
+        const deltaX = e.pageX - this.state.draggingPoint.x;
+        const deltaY = e.pageY - this.state.draggingPoint.y;
+        node.x += deltaX;
+        node.y += deltaY;
+        node.connectors.forEach(cn => {
+            cn.Position.x += deltaX;
+            cn.Position.y += deltaY;
+        });
+        this.setState({ nodes, draggingPoint: { x: e.pageX, y: e.pageY } });
+    }
 
-        const deltaX = e.pageX - startPoint.x;
-        const deltaY = e.pageY - startPoint.y;
+    handleMouseUp = () => {
+        document.removeEventListener('mousemove', this.onMouseMove);
+        this.setState({ draggingPoint: null, draggingId: null });
+    }
 
-        result.x += deltaX;
-        result.y += deltaY;
-
-        this.setState({ nodes });
+    getNodeWithId = (id, nodes): CardNode => {
+        return nodes.find((n: CardNode) => n.id === id)
     }
 
     handleDragStart = (e, type) => {
@@ -80,16 +94,11 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     handleDrop = e => {
-        const movement_type = e.dataTransfer.getData("movement-type");
-        if (movement_type === "move") {
-            this.handleCardDrop(e);
-        } else {
-            const type = e.dataTransfer.getData('type');
-            switch (type) {
-                default:
-                    this.createSRCNode(e.pageX, e.pageY, e.type);
-                    break;
-            }
+        const type = e.dataTransfer.getData('type');
+        switch (type) {
+            default:
+                this.createSRCNode(e.pageX, e.pageY, e.type);
+                break;
         }
     }
 
