@@ -86,6 +86,7 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
     onConnectorDetected = (metadata) => {
         if (this.state.Smetadata && this.state.Smetadata.isOutp !== undefined &&
             this.state.Smetadata.isOutp !== metadata.isOutp) {
+                console.log('valid connector')
             this.setState({ isValid: true, Emetadata: metadata })
         }
     }

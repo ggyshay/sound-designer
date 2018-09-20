@@ -40,9 +40,7 @@ export class Card extends React.Component<CardProps, CardState> {
     }
 
     componentDidUpdate() {
-
         this.updateConnectors();
-        return true
     }
 
     public render() {
@@ -101,11 +99,11 @@ export class Card extends React.Component<CardProps, CardState> {
             return cn
         });
 
-
         if (this.props.connect) {
             const outCon = newConnectors.find((cn: ConnectorMeta) => cn.id === this.props.connect.Outp.id);
             const inNode = this.props.nodes.find((n: CardNode) => n.id === this.props.connect.Inp.parentId);
             if (!inNode) return;
+            console.log('A connection Exists!!')
             const inCon = inNode.connectors.find((cn: ConnectorMeta) => cn.id === this.props.connect.Inp.id);
 
             if (!this.areConnected(inCon, outCon)) {
@@ -124,6 +122,6 @@ export class Card extends React.Component<CardProps, CardState> {
     }
 
     areConnected = (inCon: ConnectorMeta, outCon: ConnectorMeta) => {
-        return !!outCon.connections.find((cn: ConnectorMeta) => cn.id === inCon.id);
+        return !!outCon.connections.find((cn: ConnectorMeta) => (cn.parentId === inCon.id) && (cn.id === inCon.id));;
     }
 }

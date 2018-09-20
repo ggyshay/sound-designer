@@ -25,13 +25,13 @@ export class Connector extends React.Component<ConnectorProps, any>{
         return (
             <div>
                 <div className="connector"
-                    style={{ left: this.props.Position.x, top: this.props.Position.y, zIndex: 100 }}
+                    style={{ left: this.props.Position.x, top: this.props.Position.y}}
                     onMouseDown={e => this.handleConnectorDrag(e)}
                     onMouseOver={e => this.handleConnectorDetected(e)}
                     onMouseLeave={this.handleConnectorLost}
                 ></div>
                 {true &&
-                    <svg style={{ position: 'fixed', left: x0, top: y0, pointerEvents: 'none' }}
+                    <svg style={{ position: 'fixed', left: x0, top: y0, pointerEvents: 'none', zIndex: -10 }}
                         width={dx} height={dy} viewBox={`0 0 ${dx} ${dy}`}>
                         {this.props.connections.map(cn => {
                             const bx0 = this.props.Position.x - x0 + 7, by0 = this.props.Position.y - y0 + 7,
