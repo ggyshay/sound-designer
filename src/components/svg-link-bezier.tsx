@@ -27,11 +27,11 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
     }
     render() {
         const Inp = this.state.Smetadata && this.state.Smetadata.isOutp ? this.state.Emetadata : this.state.Smetadata;
-        const Outp =  this.state.Smetadata && this.state.Smetadata.isOutp ? this.state.Smetadata : this.state.Emetadata;
+        const Outp = this.state.Smetadata && this.state.Smetadata.isOutp ? this.state.Smetadata : this.state.Emetadata;
 
         // TODO: order mouse and S so that the bezier normal always points in the right direction
         let instructions = '';
-        if(this.state.Smetadata){
+        if (this.state.Smetadata) {
             instructions = `
             M ${this.state.Smetadata.Position.x}, ${this.state.Smetadata.Position.y}
             C ${this.state.Smetadata.Position.x + 50},${this.state.Smetadata.Position.y} ${this.state.Mouse.x - 50},${this.state.Mouse.y} ${this.state.Mouse.x},${this.state.Mouse.y}
@@ -64,7 +64,7 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
 
     pointsAreValid = () => {
         return this.state.Smetadata && this.state.Smetadata.Position.x &&
-        this.state.Smetadata.Position.y && this.state.Mouse.x && this.state.Mouse.y;
+            this.state.Smetadata.Position.y && this.state.Mouse.x && this.state.Mouse.y;
     }
 
     onDragStart = (Smetadata) => {
@@ -86,7 +86,6 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
     onConnectorDetected = (metadata) => {
         if (this.state.Smetadata && this.state.Smetadata.isOutp !== undefined &&
             this.state.Smetadata.isOutp !== metadata.isOutp) {
-                console.log('valid connector')
             this.setState({ isValid: true, Emetadata: metadata })
         }
     }

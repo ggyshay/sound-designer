@@ -7,12 +7,13 @@ import _ from 'lodash';
 export interface CardProps {
     Position: { x: number, y: number }
     id: string;
-    onConnectorDrag: (metadata: any) => void;
-    onConnectorDetected: (metadata: any) => void;
-    onConnectorLost: (e: any) => void;
+    type: string;
     connectors: ConnectorMeta[];
     connect: { Outp: ConnectorMeta, Inp: ConnectorMeta};
     nodes: CardNode[];
+    onConnectorDrag: (metadata: any) => void;
+    onConnectorDetected: (metadata: any) => void;
+    onConnectorLost: (e: any) => void;
     handleCardDrag: (e: any, id: string) => void;
     connectionCallback: () => void;
 }
@@ -70,7 +71,7 @@ export class Card extends React.Component<CardProps, CardState> {
 
                 <div className="card" onMouseDown={e => this.handleCardDrag(e)}>
                     <div className="card-header">
-                        <p>Source</p>
+                        <p>{this.props.type}</p>
                     </div>
                     <div className="card-display"></div>
                     <select className="source-selector">
@@ -103,7 +104,6 @@ export class Card extends React.Component<CardProps, CardState> {
             const outCon = newConnectors.find((cn: ConnectorMeta) => cn.id === this.props.connect.Outp.id);
             const inNode = this.props.nodes.find((n: CardNode) => n.id === this.props.connect.Inp.parentId);
             if (!inNode) return;
-            console.log('A connection Exists!!')
             const inCon = inNode.connectors.find((cn: ConnectorMeta) => cn.id === this.props.connect.Inp.id);
 
             if (!this.areConnected(inCon, outCon)) {

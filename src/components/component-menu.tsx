@@ -19,13 +19,13 @@ export class ComponentMenu extends React.Component<any, any>{
                     <img src={plusIC} className="plusIC"/>
                 </div>
                 <div className={"menu-container " + (this.state.active ? "menu-container-expanded" : "")} onMouseLeave={this.handleCloseMenu}>
-                    <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, 'src')}>
+                    <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, 'Oscillator')}>
                         <img src={sineIC} className="nodeIC"/>
                     </div>
-                    <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, 'flt')}>
+                    <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, 'Envelope')}>
                         <img src={envIC} className="nodeIC"/>
                     </div>
-                    <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, 'env')}>
+                    <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, 'Filter')}>
                         <img src={fltIC} className="nodeIC"/>
                     </div>
                 </div>

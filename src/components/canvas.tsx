@@ -15,6 +15,7 @@ export interface CardNode {
     x: number;
     y: number;
     id: string;
+    type: 'source' | 'envelope' | 'filter';
     connectors: ConnectorMeta[];
 }
 
@@ -47,6 +48,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                         connect={Outp && Inp && (n.id === Outp.parentId ? { Outp, Inp } : null)}
                         connectionCallback={this.props.connectionCallback}
                         nodes={this.state.nodes}
+                        type={n.type}
                         handleCardDrag={this.handleCardDrag}
                         onConnectorDrag={this.props.onConnectorDrag}
                         onConnectorDetected={this.props.onConnectorDetected}
@@ -90,30 +92,49 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     handleDragStart = (e, type) => {
-        e.dataTransfer.setData("type", type)
+        e.dataTransfer.setData("nodeType", type)
     }
 
     handleDrop = e => {
-        const type = e.dataTransfer.getData('type');
+        const type = e.dataTransfer.getData('nodeType');
+        const nodes = this.state.nodes.slice(0);
+        let node = null
         switch (type) {
+            case 'Filter':
+                node = this.createFLTNode(e.pageX, e.pageY, type, type + nodes.length);
+                break;
+            case 'Envelope':
+                node = this.createENVNode(e.pageX, e.pageY, type, type + nodes.length);
+                break;
             default:
-                this.createSRCNode(e.pageX, e.pageY, e.type);
+                node = this.createSRCNode(e.pageX, e.pageY, type, type + nodes.length);
                 break;
         }
+        nodes.push(node);
+        this.setState({ nodes })
     }
 
     handleDragOver = e => { e.preventDefault(); }
 
-    createSRCNode = (x, y, type) => {
-        const h = 50;
-        const nodes = this.state.nodes.slice(0);
-        const id = type + nodes.length;
-        const node: CardNode = {
-            x, y, id,
-            connectors: [{ Position: { x: 185 + x, y: h + y }, isOutp: true, id: 'c0', parentX: x, parentY: y, parentId: id, connections: [] },
-            { Position: { x: x - 9, y: y + h }, isOutp: false, id: 'c1', parentX: x, parentY: y, parentId: id, connections: [] }]
+    createSRCNode = (x, y, type, id): CardNode => {
+        return {
+            x, y, id, type,
+            connectors: [{ Position: { x: 185 + x, y: 50 + y }, isOutp: true, id: 'c0', parentX: x, parentY: y, parentId: id, connections: [] },
+            { Position: { x: x - 7, y: y + 50 }, isOutp: false, id: 'c1', parentX: x, parentY: y, parentId: id, connections: [] }]
         }
-        nodes.push(node);
-        this.setState({ nodes })
+    }
+    createFLTNode = (x, y, type, id): CardNode => {
+        return {
+            x, y, id, type,
+            connectors: [{ Position: { x: 185 + x, y: 50 + y }, isOutp: true, id: 'c0', parentX: x, parentY: y, parentId: id, connections: [] },
+            { Position: { x: x - 7, y: y + 50 }, isOutp: false, id: 'c1', parentX: x, parentY: y, parentId: id, connections: [] }]
+        }
+    }
+    createENVNode = (x, y, type, id): CardNode => {
+        return {
+            x, y, id, type,
+            connectors: [{ Position: { x: 185 + x, y: 50 + y }, isOutp: true, id: 'c0', parentX: x, parentY: y, parentId: id, connections: [] },
+            { Position: { x: x - 7, y: y + 50 }, isOutp: false, id: 'c1', parentX: x, parentY: y, parentId: id, connections: [] }]
+        }
     }
 }
