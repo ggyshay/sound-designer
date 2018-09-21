@@ -91,7 +91,6 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
     }
 
     onConnectorLost = e => {
-        // depois de deixar a conexão e sair do no isso roda e tira o Emeta do state
         this.setState({ isValid: false, Emetadata: null })
     }
 

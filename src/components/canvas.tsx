@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Card, ConnectorMeta } from '../atoms';
 import { ComponentMenu } from './component-menu';
-
+import { EngineComponent } from './engine-component';
 
 export interface CanvasProps {
     onConnectorDrag: (metadata: any) => void;
@@ -15,7 +15,7 @@ export interface CardNode {
     x: number;
     y: number;
     id: string;
-    type: 'source' | 'envelope' | 'filter';
+    type: string;
     connectors: ConnectorMeta[];
 }
 
@@ -42,9 +42,8 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             <div className="App" onDragOver={(e) => this.handleDragOver(e)} onDrop={e => this.handleDrop(e)}
                 onMouseUp={this.handleMouseUp}>
                 {this.state.nodes.map((n: CardNode) => {
-                    return (<Card
+                    return (<EngineComponent
                         Position={{ x: n.x, y: n.y }}
-                        connectors={n.connectors}
                         connect={Outp && Inp && (n.id === Outp.parentId ? { Outp, Inp } : null)}
                         connectionCallback={this.props.connectionCallback}
                         nodes={this.state.nodes}
@@ -55,6 +54,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                         onConnectorLost={this.props.onConnectorLost}
                         key={n.id}
                         id={n.id}
+                        connectorsCreateCB={this.handleCreateEngine}
                     />);
                 })}
 
@@ -95,46 +95,23 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         e.dataTransfer.setData("nodeType", type)
     }
 
-    handleDrop = e => {
+    handleDrop = (e: any) => {
         const type = e.dataTransfer.getData('nodeType');
         const nodes = this.state.nodes.slice(0);
-        let node = null
-        switch (type) {
-            case 'Filter':
-                node = this.createFLTNode(e.pageX, e.pageY, type, type + nodes.length);
-                break;
-            case 'Envelope':
-                node = this.createENVNode(e.pageX, e.pageY, type, type + nodes.length);
-                break;
-            default:
-                node = this.createSRCNode(e.pageX, e.pageY, type, type + nodes.length);
-                break;
-        }
+        const node = {
+            x: e.pageX, y: e.pageY, id: type + nodes.length, type,
+            connectors: []
+        };
         nodes.push(node);
         this.setState({ nodes })
     }
 
     handleDragOver = e => { e.preventDefault(); }
 
-    createSRCNode = (x, y, type, id): CardNode => {
-        return {
-            x, y, id, type,
-            connectors: [{ Position: { x: 185 + x, y: 50 + y }, isOutp: true, id: 'c0', parentX: x, parentY: y, parentId: id, connections: [] },
-            { Position: { x: x - 7, y: y + 50 }, isOutp: false, id: 'c1', parentX: x, parentY: y, parentId: id, connections: [] }]
-        }
-    }
-    createFLTNode = (x, y, type, id): CardNode => {
-        return {
-            x, y, id, type,
-            connectors: [{ Position: { x: 185 + x, y: 50 + y }, isOutp: true, id: 'c0', parentX: x, parentY: y, parentId: id, connections: [] },
-            { Position: { x: x - 7, y: y + 50 }, isOutp: false, id: 'c1', parentX: x, parentY: y, parentId: id, connections: [] }]
-        }
-    }
-    createENVNode = (x, y, type, id): CardNode => {
-        return {
-            x, y, id, type,
-            connectors: [{ Position: { x: 185 + x, y: 50 + y }, isOutp: true, id: 'c0', parentX: x, parentY: y, parentId: id, connections: [] },
-            { Position: { x: x - 7, y: y + 50 }, isOutp: false, id: 'c1', parentX: x, parentY: y, parentId: id, connections: [] }]
-        }
+    handleCreateEngine = (connectors: ConnectorMeta[], id: string) => {
+        const nodes = this.state.nodes.slice(0);
+        const node = this.getNodeWithId(id, nodes);
+        node.connectors = connectors.slice(0);
+        this.setState({ nodes });
     }
 }

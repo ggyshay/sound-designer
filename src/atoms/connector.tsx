@@ -38,7 +38,7 @@ export class Connector extends React.Component<ConnectorProps, any>{
                                 bx1 = cn.Position.x - x0 + 7, by1 = cn.Position.y - y0 + 7;
                             return (
                                 <Bezier P1={{ x: bx0, y: by0 }} P2={{ x: bx1, y: by1 }}
-                                key={this.props.parentId + this.props.id + cn.id + cn.parentId}/>)
+                                key={this.props.id + cn.id}/>)
                         })}
                     </svg>
                 }
