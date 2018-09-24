@@ -14,8 +14,9 @@ export interface ConnectorProps {
     parentY: number; // TODO: change to ParentPosition
     parentId: string;
     id: string;
-    connections: any;
-    nodes: CardNode[];
+    connections?: any;
+    nodes?: CardNode[];
+    type: string;
 }
 
 export class Connector extends React.Component<ConnectorProps, any>{
@@ -30,7 +31,7 @@ export class Connector extends React.Component<ConnectorProps, any>{
                     onMouseOver={e => this.handleConnectorDetected(e)}
                     onMouseLeave={this.handleConnectorLost}
                 ></div>
-                {true &&
+                {this.props.connections &&
                     <svg style={{ position: 'fixed', left: x0, top: y0, pointerEvents: 'none', zIndex: -10 }}
                         width={dx} height={dy} viewBox={`0 0 ${dx} ${dy}`}>
                         {this.props.connections.map(cn => {
@@ -70,7 +71,8 @@ export class Connector extends React.Component<ConnectorProps, any>{
             id: this.props.id,
             connections: this.props.connections.slice(0),
             parentX: this.props.parentX,
-            parentY: this.props.parentY
+            parentY: this.props.parentY,
+            type: this.props.type
         })
     }
 

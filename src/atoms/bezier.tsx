@@ -7,8 +7,10 @@ export interface BezierProps{
 } 
 
 export class Bezier extends React.Component<BezierProps> {
+    
     render() {
         const instructions = this.createInstructions();
+        console.log('bezier ', instructions);
         return instructions ? (
                 <path
                     d={instructions}

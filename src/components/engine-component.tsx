@@ -1,23 +1,21 @@
-import * as React from 'react';
-import { Card, ConnectorMeta } from '../atoms';
-import { CardNode } from './canvas';
 import _ from 'lodash';
+import * as React from 'react';
+import { ConnectorMeta } from '../atoms';
+import { CardNode } from './canvas';
 
 export interface EngineComponentProps {
     type: string;
-    Position: { x: number, y: number }
-    id: string;
     connect: { Outp: ConnectorMeta, Inp: ConnectorMeta };
-    nodes: CardNode[];
-    onConnectorDrag: (metadata: any) => void;
-    onConnectorDetected: (metadata: any) => void;
-    onConnectorLost: (e: any) => void;
-    handleCardDrag: (e: any, id: string) => void;
     connectionCallback: () => void;
-    connectorsCreateCB: (connectors: ConnectorMeta[], id: string) => void;
+    ctx: AudioContext;
+    connectorsCreateCB: (connectors: ConnectorMeta[], id: string, engine: AudioNode) => void
+    nodes: CardNode[];
 }
 
+export type EngineType = OscillatorNode|BiquadFilterNode|GainNode|AudioDestinationNode
+
 export class EngineComponent extends React.Component<EngineComponentProps, any> {
+    private engine:EngineType = null;
     constructor(props: EngineComponentProps) {
         super(props);
         this.state = {
@@ -25,31 +23,34 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
             connect: null,
             connectors: [],
         }
+
+        switch (props.type) {
+            case 'Oscillator':
+                this.engine = this.props.ctx.createOscillator();
+                this.engine.start();
+                break;
+            case 'Filter':
+                this.engine = this.props.ctx.createBiquadFilter();
+                break;
+            case 'Envelope':
+                this.engine = this.props.ctx.createGain();
+                break;
+            case 'Output': 
+                this.engine = this.props.ctx.destination;
+        }
     }
     componentWillMount() { this.createConnectors(); }
     componentDidUpdate() { if (this.props.connect) this.checkConnect(); }
 
     render() {
-        // TODO:
-        // create audio node
+        const { children } = this.props;
+        const childrenWithProps = React.Children.map(children, (child: any) =>
+            React.cloneElement(child, {
+                connectors: this.state.connectors, connect: this.state.connect,
+                connectorsCreateCB: (connectors: ConnectorMeta[], id: string) => this.props.connectorsCreateCB(connectors, id, this.engine)
+            }));
 
-        return (
-            <Card
-                Position={this.props.Position}
-                id={this.props.id}
-                type={this.props.type}
-                connectors={this.state.connectors}
-                connect={this.state.connect}
-                nodes={this.props.nodes}
-
-                onConnectorDrag={this.props.onConnectorDrag}
-                onConnectorDetected={this.props.onConnectorDetected}
-                onConnectorLost={this.props.onConnectorLost}
-                handleCardDrag={this.props.handleCardDrag}
-                connectionCallback={this.props.connectionCallback}
-                connectorsCreateCB={this.props.connectorsCreateCB}
-            />
-        );
+        return <div>{childrenWithProps}</div>
     }
 
     checkConnect = () => {
@@ -57,6 +58,8 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
         if (this.props.connect.Outp && this.props.connect.Inp) {
             if (!this.areConnected(this.props.connect.Inp, this.props.connect.Outp)) {
                 this.setState({ connect: this.props.connect })
+                this.connectEngines(this.findNodeWithId(this.props.connect.Outp.parentId),
+                    this.findNodeWithId(this.props.connect.Inp.parentId), this.props.connect.Outp.type, this.props.connect.Inp.type)
             } else {
                 this.props.connectionCallback();
             }
@@ -65,21 +68,41 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
         }
     }
 
+    connectEngines = (outNode: CardNode, inNode: CardNode, outParameter: string, inParameter: string) => {
+        if (outParameter === 'OutSignal' && inParameter === "InSignal") {
+            outNode.engine.connect(inNode.engine);
+        } else if (outParameter === 'OutSignal') {
+            outNode.engine.connect(inNode.engine[inParameter]);
+        } else if (inParameter === 'InSignal') {
+            outNode.engine[outParameter].connect(inNode.engine);
+        } else {
+            outNode.engine[outParameter].connect(inNode.engine[inParameter]);
+        }
+    }
+
     areConnected = (inCon: ConnectorMeta, outCon: ConnectorMeta) => {
         return !!outCon.connections.find((cn: ConnectorMeta) => (cn.id === inCon.id));
+    }
+
+    findNodeWithId = (id: string) => {
+        if (!this.props.nodes) { return }
+        return this.props.nodes.find((n: CardNode) => n.id === id);
     }
 
     createConnectors = () => {
         let connectors = null
         switch (this.props.type) {
+            case 'Output':
+                connectors = { inputs: ['InSignal'], outputs: [] };
+                break;
             case 'Filter':
-                connectors = { inputs: ['Cutoff', 'Resonance', 'InSignal'], outputs: ['OutSignal'] }
+                connectors = { inputs: ['cutoff', 'resonance', 'InSignal'], outputs: ['OutSignal'] }
                 break;
             case 'Envelope':
                 connectors = { inputs: ['Attack', 'Decay', 'Sustain', 'Release', 'InSignal'], outputs: ['OutSignal'] }
                 break;
             default:
-                connectors = { inputs: ['Frequency'], outputs: ['OutSignal'] }
+                connectors = { inputs: ['frequency'], outputs: ['OutSignal'] }
                 break;
 
         }

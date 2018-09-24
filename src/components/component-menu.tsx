@@ -35,7 +35,7 @@ export class ComponentMenu extends React.Component<any, any>{
 
     handleOpenMenu = () => {
         this.setState({ active: true });
-        setTimeout(this.handleCloseMenu, 3000);
+        setTimeout(this.handleCloseMenu, 5000);
     }
 
     handleCloseMenu = () => {

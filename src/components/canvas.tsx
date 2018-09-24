@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Card, ConnectorMeta } from '../atoms';
 import { ComponentMenu } from './component-menu';
 import { EngineComponent } from './engine-component';
+import { OutputComponent } from '../atoms/output';
 
 export interface CanvasProps {
     onConnectorDrag: (metadata: any) => void;
@@ -17,6 +18,7 @@ export interface CardNode {
     id: string;
     type: string;
     connectors: ConnectorMeta[];
+    engine: AudioNode;
 }
 
 export interface CanvasState {
@@ -26,10 +28,12 @@ export interface CanvasState {
 }
 
 export class Canvas extends React.Component<CanvasProps, CanvasState> {
+    private ctx: AudioContext;
     constructor(props) {
         super(props);
+        this.ctx = new AudioContext;
         this.state = {
-            nodes: [],
+            nodes: [{x: 500, y: 300, id: 'Output', type:'Output', connectors:[], engine: null }],
             draggingId: null,
             draggingPoint: null
         };
@@ -43,19 +47,27 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 onMouseUp={this.handleMouseUp}>
                 {this.state.nodes.map((n: CardNode) => {
                     return (<EngineComponent
-                        Position={{ x: n.x, y: n.y }}
                         connect={Outp && Inp && (n.id === Outp.parentId ? { Outp, Inp } : null)}
                         connectionCallback={this.props.connectionCallback}
-                        nodes={this.state.nodes}
                         type={n.type}
-                        handleCardDrag={this.handleCardDrag}
-                        onConnectorDrag={this.props.onConnectorDrag}
-                        onConnectorDetected={this.props.onConnectorDetected}
-                        onConnectorLost={this.props.onConnectorLost}
-                        key={n.id}
-                        id={n.id}
+                        ctx={this.ctx}
                         connectorsCreateCB={this.handleCreateEngine}
-                    />);
+                        nodes={this.state.nodes}
+                    >
+                        <Card
+                            Position={{ x: n.x, y: n.y }}
+                            connectionCallback={this.props.connectionCallback}
+                            nodes={this.state.nodes}
+                            type={n.type}
+                            handleCardDrag={this.handleCardDrag}
+                            onConnectorDrag={this.props.onConnectorDrag}
+                            onConnectorDetected={this.props.onConnectorDetected}
+                            onConnectorLost={this.props.onConnectorLost}
+                            key={n.id}
+                            id={n.id}
+                        />
+                    </EngineComponent>
+                    );
                 })}
 
                 <ComponentMenu handleDrag={this.handleDragStart} />
@@ -100,7 +112,8 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         const nodes = this.state.nodes.slice(0);
         const node = {
             x: e.pageX, y: e.pageY, id: type + nodes.length, type,
-            connectors: []
+            connectors: [],
+            engine: null,
         };
         nodes.push(node);
         this.setState({ nodes })
@@ -108,9 +121,10 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     handleDragOver = e => { e.preventDefault(); }
 
-    handleCreateEngine = (connectors: ConnectorMeta[], id: string) => {
+    handleCreateEngine = (connectors: ConnectorMeta[], id: string, engine: AudioNode) => {
         const nodes = this.state.nodes.slice(0);
         const node = this.getNodeWithId(id, nodes);
+        node.engine = engine;
         node.connectors = connectors.slice(0);
         this.setState({ nodes });
     }

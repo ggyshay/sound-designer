@@ -3,20 +3,21 @@ import './card.css';
 import { Connector, CardComponent } from './';
 import { CardNode } from '../components'
 import _ from 'lodash';
+import { OutputComponent } from './output';
 
 export interface CardProps {
     Position: { x: number, y: number }
     id: string;
     type: string;
-    connectors: { inputs: string[], outputs: string[] };
-    connect: { Outp: ConnectorMeta, Inp: ConnectorMeta };
+    connectors?: { inputs: string[], outputs: string[] };
+    connect?: { Outp: ConnectorMeta, Inp: ConnectorMeta };
     nodes: CardNode[];
     onConnectorDrag: (metadata: any) => void;
     onConnectorDetected: (metadata: any) => void;
     onConnectorLost: (e: any) => void;
     handleCardDrag: (e: any, id: string) => void;
     connectionCallback: () => void;
-    connectorsCreateCB: (connectors: ConnectorMeta[], id: string) => void;
+    connectorsCreateCB?: (connectors: ConnectorMeta[], id: string) => void;
 }
 
 export type ConnectorMeta = {
@@ -27,6 +28,7 @@ export type ConnectorMeta = {
     parentId: string;
     parentX: number,
     parentY: number,
+    type: string,
 }
 
 export interface CardState {
@@ -51,13 +53,13 @@ export class Card extends React.Component<CardProps, CardState> {
         inputs.map((inp, idx) => {
             connectors.push({
                 Position: { x: x - 7, y: y + 50 + idx * 30 }, isOutp: false,
-                id: id + inp, parentX: x, parentY: y, parentId: id, connections: []
+                id: id + inp, parentX: x, parentY: y, parentId: id, connections: [], type: inp
             })
         })
         outputs.map((outp, idx) => {
             connectors.push({
                 Position: { x: x + 185, y: y + 50 + idx * 30 }, isOutp: true,
-                id: id + outp, parentX: x, parentY: y, parentId: id, connections: []
+                id: id + outp, parentX: x, parentY: y, parentId: id, connections: [], type: outp
             })
         })
         this.props.connectorsCreateCB(connectors, this.props.id);
@@ -65,30 +67,42 @@ export class Card extends React.Component<CardProps, CardState> {
     }
 
     public render() {
-        return (
-            <div className="card-holder" style={{ left: this.props.Position.x, top: this.props.Position.y }}>
-                {this.state.connectors.map(cn => {
-                    return (
-                        <Connector
-                            parentX={this.props.Position.x}
-                            parentY={this.props.Position.y}
-                            Position={cn.Position}
-                            id={cn.id}
-                            parentId={this.props.id}
-                            isOutp={cn.isOutp}
-                            onConnectorDetected={this.props.onConnectorDetected}
-                            onConnectorDrag={this.props.onConnectorDrag}
-                            onConnectorLost={this.props.onConnectorLost}
-                            connections={cn.connections}
-                            key={cn.id}
-                            nodes={this.props.nodes}
-                        />
-                    )
-                })}
+        return this.props.type === 'Output' ? (
+            <OutputComponent
+                Position={this.props.Position}
+                connector={this.state.connectors && this.state.connectors[0]}
+                id={this.props.type}
+                onConnectorDetected={this.props.onConnectorDetected}
+                onConnectorDrag={this.props.onConnectorDrag}
+                onConnectorLost={this.props.onConnectorLost}
+                handleCardDrag={this.props.handleCardDrag}
+                type={this.props.type}
+            />
+        ) : (
+                <div className="card-holder" style={{ left: this.props.Position.x, top: this.props.Position.y }}>
+                    {this.state.connectors.map(cn => {
+                        return (
+                            <Connector
+                                parentX={this.props.Position.x}
+                                parentY={this.props.Position.y}
+                                Position={cn.Position}
+                                id={cn.id}
+                                parentId={this.props.id}
+                                isOutp={cn.isOutp}
+                                onConnectorDetected={this.props.onConnectorDetected}
+                                onConnectorDrag={this.props.onConnectorDrag}
+                                onConnectorLost={this.props.onConnectorLost}
+                                connections={cn.connections}
+                                key={cn.id}
+                                nodes={this.props.nodes}
+                                type={cn.type}
+                            />
+                        )
+                    })}
 
-                <CardComponent type={this.props.type} handleCardDrag={this.handleCardDrag}/> 
-            </div>
-        )
+                    <CardComponent type={this.props.type} handleCardDrag={this.handleCardDrag} />
+                </div>
+            )
     }
 
     handleCardDrag = e => {
@@ -118,6 +132,7 @@ export class Card extends React.Component<CardProps, CardState> {
     }
 
     recalculateConnection = (nid: string, cid: string, nodes: CardNode[]) => {
+        console.log('recalc ',nid, cid, nodes )
         const node = nodes.find((n: CardNode) => n.id === nid);
         return node.connectors.find((cn) => cn.id == cid);
     }
