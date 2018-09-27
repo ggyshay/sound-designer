@@ -1,8 +1,12 @@
 import * as React from 'react';
 import { Card, ConnectorMeta } from '../atoms';
+import { AudioEngine } from '../atoms/audio-engine';
+import { findNodeWithId } from '../utils/nodeOperations';
 import { ComponentMenu } from './component-menu';
 import { EngineComponent } from './engine-component';
-import { OutputComponent } from '../atoms/output';
+
+
+
 
 export interface CanvasProps {
     onConnectorDrag: (metadata: any) => void;
@@ -18,7 +22,7 @@ export interface CardNode {
     id: string;
     type: string;
     connectors: ConnectorMeta[];
-    engine: AudioNode;
+    engine: AudioEngine;
 }
 
 export interface CanvasState {
@@ -33,7 +37,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         super(props);
         this.ctx = new AudioContext;
         this.state = {
-            nodes: [{x: 500, y: 300, id: 'Output', type:'Output', connectors:[], engine: null }],
+            nodes: [{ x: 500, y: 300, id: 'Output', type: 'Output', connectors: [], engine: null }],
             draggingId: null,
             draggingPoint: null
         };
@@ -67,8 +71,11 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                             id={n.id}
                         />
                     </EngineComponent>
+
                     );
                 })}
+
+
 
                 <ComponentMenu handleDrag={this.handleDragStart} />
             </div>
@@ -82,7 +89,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     onMouseMove = (e: MouseEvent) => {
         const nodes = this.state.nodes.slice(0)
-        const node = this.getNodeWithId(this.state.draggingId, nodes)
+        const node = findNodeWithId(this.state.draggingId, nodes);
         const deltaX = e.pageX - this.state.draggingPoint.x;
         const deltaY = e.pageY - this.state.draggingPoint.y;
         node.x += deltaX;
@@ -97,10 +104,6 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     handleMouseUp = () => {
         document.removeEventListener('mousemove', this.onMouseMove);
         this.setState({ draggingPoint: null, draggingId: null });
-    }
-
-    getNodeWithId = (id, nodes): CardNode => {
-        return nodes.find((n: CardNode) => n.id === id)
     }
 
     handleDragStart = (e, type) => {
@@ -121,9 +124,9 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     handleDragOver = e => { e.preventDefault(); }
 
-    handleCreateEngine = (connectors: ConnectorMeta[], id: string, engine: AudioNode) => {
+    handleCreateEngine = (connectors: ConnectorMeta[], id: string, engine: AudioEngine) => {
         const nodes = this.state.nodes.slice(0);
-        const node = this.getNodeWithId(id, nodes);
+        const node = findNodeWithId(id, nodes);
         node.engine = engine;
         node.connectors = connectors.slice(0);
         this.setState({ nodes });

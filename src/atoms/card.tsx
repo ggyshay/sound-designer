@@ -1,9 +1,11 @@
-import * as React from 'react';
-import './card.css';
-import { Connector, CardComponent } from './';
-import { CardNode } from '../components'
 import _ from 'lodash';
+import * as React from 'react';
+import { CardNode } from '../components';
+import { OscillatorCard } from '../components/cards/oscillator-card';
+import { Connector } from './';
+import './card.css';
 import { OutputComponent } from './output';
+import { FilterCard, EnvelopeCard } from '../components/cards';
 
 export interface CardProps {
     Position: { x: number, y: number }
@@ -18,6 +20,7 @@ export interface CardProps {
     handleCardDrag: (e: any, id: string) => void;
     connectionCallback: () => void;
     connectorsCreateCB?: (connectors: ConnectorMeta[], id: string) => void;
+    onParamChange?: (param: string, value: string | number) => void;
 }
 
 export type ConnectorMeta = {
@@ -80,27 +83,56 @@ export class Card extends React.Component<CardProps, CardState> {
             />
         ) : (
                 <div className="card-holder" style={{ left: this.props.Position.x, top: this.props.Position.y }}>
-                    {this.state.connectors.map(cn => {
-                        return (
-                            <Connector
-                                parentX={this.props.Position.x}
-                                parentY={this.props.Position.y}
-                                Position={cn.Position}
-                                id={cn.id}
-                                parentId={this.props.id}
-                                isOutp={cn.isOutp}
-                                onConnectorDetected={this.props.onConnectorDetected}
-                                onConnectorDrag={this.props.onConnectorDrag}
-                                onConnectorLost={this.props.onConnectorLost}
-                                connections={cn.connections}
-                                key={cn.id}
-                                nodes={this.props.nodes}
-                                type={cn.type}
-                            />
-                        )
-                    })}
-
-                    <CardComponent type={this.props.type} handleCardDrag={this.handleCardDrag} />
+                    
+                    {(() => {
+                        switch (this.props.type) {
+                            case 'Filter':
+                                return (
+                                    <FilterCard
+                                        onParamChange={this.props.onParamChange}
+                                        handleCardDrag={this.handleCardDrag}
+                                        type={this.props.type}
+                                        connectors={this.state.connectors}
+                                        Position={this.props.Position}
+                                        id={this.props.id}
+                                        nodes={this.props.nodes}
+                                        onConnectorDetected={this.props.onConnectorDetected}
+                                        onConnectorDrag={this.props.onConnectorDrag}
+                                        onConnectorLost={this.props.onConnectorLost}
+                                    />
+                                )
+                            case 'Envelope':
+                                return (
+                                    <EnvelopeCard
+                                        onParamChange={this.props.onParamChange}
+                                        handleCardDrag={this.handleCardDrag}
+                                        type={this.props.type}
+                                        connectors={this.state.connectors}
+                                        Position={this.props.Position}
+                                        id={this.props.id}
+                                        nodes={this.props.nodes}
+                                        onConnectorDetected={this.props.onConnectorDetected}
+                                        onConnectorDrag={this.props.onConnectorDrag}
+                                        onConnectorLost={this.props.onConnectorLost}
+                                    />
+                                )
+                            default:
+                                return (
+                                    <OscillatorCard
+                                        onParamChange={this.props.onParamChange}
+                                        handleCardDrag={this.handleCardDrag}
+                                        type={this.props.type}
+                                        connectors={this.state.connectors}
+                                        Position={this.props.Position}
+                                        id={this.props.id}
+                                        nodes={this.props.nodes}
+                                        onConnectorDetected={this.props.onConnectorDetected}
+                                        onConnectorDrag={this.props.onConnectorDrag}
+                                        onConnectorLost={this.props.onConnectorLost}
+                                    />
+                                )
+                        }
+                    })()}
                 </div>
             )
     }
@@ -132,7 +164,6 @@ export class Card extends React.Component<CardProps, CardState> {
     }
 
     recalculateConnection = (nid: string, cid: string, nodes: CardNode[]) => {
-        console.log('recalc ',nid, cid, nodes )
         const node = nodes.find((n: CardNode) => n.id === nid);
         return node.connectors.find((cn) => cn.id == cid);
     }

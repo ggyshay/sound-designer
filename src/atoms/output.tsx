@@ -54,14 +54,10 @@ export class OutputComponent extends React.Component<OutputComponentProps> {
     }
 
     handleConnectorDetected = e => {
-        const rect = this.ref && this.ref.current && this.ref.current.getBoundingClientRect();
-        const x = rect && rect.left;
-        const y = rect && rect.top;
         this.props.onConnectorDetected(this.metadata())
     }
 
     handleConnectorLost = e => {
-
         this.props.onConnectorLost(this.metadata())
     }
 

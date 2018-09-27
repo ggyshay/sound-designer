@@ -6,6 +6,7 @@
     "lodash": "^4.17.11",
     "react": "^16.5.1",
     "react-dom": "^16.5.1",
+    "react-rotary-knob": "^1.1.1",
     "react-scripts-ts": "2.17.0"
   },
   "scripts": {
