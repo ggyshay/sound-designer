@@ -59,7 +59,6 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     }
 
     connectEngines = (outNode: CardNode, inNode: CardNode, outParameter: string, inParameter: string) => {
-        debugger;
         this.engine.connect(inNode.engine, outParameter, inParameter);
     }
 
@@ -87,6 +86,8 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     }
 
     handleParamChange = (param: string, value: string | number) => {
-        if (this.engine) { this.engine.changeParam(param, value) }
+        if (this.engine) {
+            this.engine.changeParam(param, value)
+        }
     }
 }

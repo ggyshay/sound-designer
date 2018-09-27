@@ -13,6 +13,7 @@ export class AudioEngine {
     }
 
     start = () => {
+        debugger;
         if (this.engine && this.engine instanceof OscillatorNode) {
             this.engine.start();
             this.playing = true;
@@ -40,11 +41,13 @@ export class AudioEngine {
                 break;
             case 'Output':
                 this.engine = this.ctx.destination;
+                break;
         }
     }
 
     connect = (inEngine: AudioEngine, outParameter: string, inParameter: string) => {
         this.setup();
+        debugger;
         if (outParameter === 'OutSignal' && inParameter === "InSignal") {
             this.engine.connect(inEngine.engine);
         } else if (outParameter === 'OutSignal') {
@@ -54,6 +57,7 @@ export class AudioEngine {
         } else {
             this.engine[outParameter].connect(inEngine.engine[inParameter]);
         }
+        debugger;
         this.start();
     }
 
@@ -63,7 +67,23 @@ export class AudioEngine {
 
     changeParam = (param: string, value: string | number) => {
         if(this.engine && this.engine[param]){
-            this.engine[param] = value;
+            if(typeof value === 'string'){
+                this.engine[param] = value;
+            } else if(typeof value === 'number'){
+                this.engine[param].value = value;
+            }
         }
     }
+}
+
+export enum FilterTypes {
+    HPF = 'highpass',
+    LPF = 'lowpass',
+    BPF = 'bandpass'
+}
+export enum OscillatorTypes {
+    sine = 'sine',
+    saw = 'sawtooth',
+    triangle = 'triangle',
+    square = 'square'
 }

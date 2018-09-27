@@ -2,8 +2,7 @@ import * as React from 'react';
 import { Canvas } from './'
 import { ConnectorMeta } from '../atoms';
 import './x.css'
-import { Knob } from "react-rotary-knob";
-import skin from '../atoms/knob-skin';
+
 
 export interface BezierState {
     Smetadata: ConnectorMeta | null;
@@ -62,15 +61,7 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
                     />
                 </div>
 
-                <Knob
-                    style={{ display: "inline-block" }}
-                    min={100}
-                    max={500}
-                    unlockDistance={0}
-                    skin={skin}
-                    stopper={true}
-                    angleArc={200}
-                />
+  
             </div>
         );
     }
