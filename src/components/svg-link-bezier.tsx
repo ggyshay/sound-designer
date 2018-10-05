@@ -1,79 +1,83 @@
 import * as React from 'react';
-import { Canvas } from './'
-import { ConnectorMeta } from '../atoms';
-import './x.css'
+import { Subscribe } from 'unstated';
+import { ConnectionProvider } from '../providers/connection.provider';
+import { Canvas } from './';
 
 
 export interface BezierState {
-    Smetadata: ConnectorMeta | null;
     Mouse: {
         x: number;
         y: number;
-    },
-    Emetadata: ConnectorMeta | null;
-    isValid: boolean;
+    };
+    isDragging: boolean;
 }
 
 export class SVGLinkBezier extends React.Component<any, BezierState> {
+    private connectionProvider: ConnectionProvider = null;
     constructor(props) {
         super(props);
         this.state = {
-            Smetadata: null,
-            Emetadata: null,
+            isDragging: false,
             Mouse: {
                 x: null,
                 y: null,
             },
-            isValid: false,
         }
     }
     render() {
-        const Inp = this.state.Smetadata && this.state.Smetadata.isOutp ? this.state.Emetadata : this.state.Smetadata;
-        const Outp = this.state.Smetadata && this.state.Smetadata.isOutp ? this.state.Smetadata : this.state.Emetadata;
 
-        // TODO: order mouse and S so that the bezier normal always points in the right direction
-        let instructions = '';
-        if (this.state.Smetadata) {
-            instructions = `
-            M ${this.state.Smetadata.Position.x}, ${this.state.Smetadata.Position.y}
-            C ${this.state.Smetadata.Position.x + 50},${this.state.Smetadata.Position.y} ${this.state.Mouse.x - 50},${this.state.Mouse.y} ${this.state.Mouse.x},${this.state.Mouse.y}
-            `
-        }
         return (
-            <div onMouseUp={this.onMouseUp}>
-                <svg style={{ position: 'absolute' }} width="100%" height="100%">
-                    {this.pointsAreValid() &&
-                        <path
-                            d={instructions}
-                            fill="none"
-                            stroke="#00DACD"
-                            strokeWidth={5}
-                        />
+            <Subscribe to={[ConnectionProvider]}>
+                {(connectionProvider: ConnectionProvider) => {
+                    this.connectionProvider = connectionProvider;
+                    const { Smetadata } = this.connectionProvider.state;
+                    let instructions = '';
+                    if (Smetadata) {
+                        instructions = `
+                        M ${Smetadata.Position.x}, ${Smetadata.Position.y}
+                        C ${Smetadata.Position.x + 50},${Smetadata.Position.y} ${this.state.Mouse.x - 50},${this.state.Mouse.y} ${this.state.Mouse.x},${this.state.Mouse.y}
+                        `
                     }
-                </svg>
-                <div style={{ position: 'absolute', top: '0', left: '0' }}>
-                    <Canvas
-                        onConnectorDrag={this.onDragStart}
-                        onConnectorDetected={this.onConnectorDetected}
-                        onConnectorLost={this.onConnectorLost}
-                        currentConnection={{ Inp, Outp }}
-                        connectionCallback={this.cleanConnection}
-                    />
-                </div>
+                    return (
+                        <div onMouseUp={this.onMouseUp}>
+                            <svg style={{ position: 'absolute' }} width="100%" height="100%">
+                                {this.pointsAreValid() &&
+                                    <path
+                                        d={instructions}
+                                        fill="none"
+                                        stroke="#00DACD"
+                                        strokeWidth={5}
+                                    />
+                                }
+                            </svg>
+                            <div style={{ position: 'absolute', top: '0', left: '0' }}>
+                                <Canvas
+                                    onConnectorDrag={this.onDragStart}
+                                    onConnectorDetected={this.onConnectorDetected}
+                                    onConnectorLost={this.onConnectorLost}
+                                    currentConnection={{
+                                        Inp: this.connectionProvider.getInput(),
+                                        Outp: this.connectionProvider.getOutput()
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )
+                }}
+            </Subscribe>
 
-  
-            </div>
         );
     }
 
     pointsAreValid = () => {
-        return this.state.Smetadata && this.state.Smetadata.Position.x &&
-            this.state.Smetadata.Position.y && this.state.Mouse.x && this.state.Mouse.y;
+        return this.connectionProvider.state.Smetadata && this.connectionProvider.state.Smetadata.Position.x &&
+            this.connectionProvider.state.Smetadata.Position.y && this.state.Mouse.x && this.state.Mouse.y;
     }
 
     onDragStart = (Smetadata) => {
         document.addEventListener('mousemove', this.onMouseMove);
-        this.setState({ Smetadata });
+        this.connectionProvider.setSPoint(Smetadata);
+        this.setState({ isDragging: true });
     }
 
     onMouseMove = e => {
@@ -82,23 +86,28 @@ export class SVGLinkBezier extends React.Component<any, BezierState> {
 
     onMouseUp = e => {
         document.removeEventListener('mousemove', this.onMouseMove);
-        if (!this.state.isValid) {
-            this.setState({ Mouse: { x: null, y: null }, Smetadata: null });
+        if (!this.connectionProvider.state.isValid) {
+            this.connectionProvider.setSPoint(null);
+            this.setState({ Mouse: { x: null, y: null } });
         }
+        this.setState({ isDragging: false });
     }
 
-    onConnectorDetected = (metadata) => {
-        if (this.state.Smetadata && this.state.Smetadata.isOutp !== undefined &&
-            this.state.Smetadata.isOutp !== metadata.isOutp) {
-            this.setState({ isValid: true, Emetadata: metadata })
+    onConnectorDetected = (Emetadata) => {
+        if (this.state.isDragging) {
+            this.connectionProvider.setEPoint(Emetadata)
         }
     }
 
     onConnectorLost = e => {
-        this.setState({ isValid: false, Emetadata: null })
+        if(this.state.isDragging){
+            this.connectionProvider.setEPoint(null);
+        }
     }
 
     cleanConnection = () => {
-        this.setState({ isValid: false, Emetadata: null, Smetadata: null, Mouse: { x: null, y: null } });
+        this.connectionProvider.setEPoint(null);
+        this.connectionProvider.setSPoint(null);
+        this.setState({ Mouse: { x: null, y: null } });
     }
 }

@@ -1,20 +1,26 @@
 import * as React from 'react';
 import "./bezier.css"
 
-export interface BezierProps{
-    P1: { x: number, y: number;};
-    P2: {x: number, y: number}
-} 
+export interface BezierProps {
+    P1: { x: number, y: number; };
+    P2: { x: number, y: number }
+    selected: boolean;
+    onClick: (e) => void;
+    onDoubleClick: (e) => void;
+}
 
 export class Bezier extends React.Component<BezierProps> {
-    
+
     render() {
         const instructions = this.createInstructions();
+        const classname = "curve" + (this.props.selected ? ' selected' : '')
         return instructions ? (
-                <path
-                    d={instructions}
-                    className="curve"
-                />
+            <path
+                onDoubleClick={this.props.onDoubleClick}
+                onClick={this.props.onClick}
+                d={instructions}
+                className={classname}
+            />
         ) : null;
     }
 
@@ -31,7 +37,7 @@ export class Bezier extends React.Component<BezierProps> {
     orderPoints = () => {
         const { P1, P2 } = this.props;
         if (typeof P1.x === 'number' &&
-            typeof P1.y === 'number' && 
+            typeof P1.y === 'number' &&
             typeof P2.x === 'number' &&
             typeof P2.y === 'number') {
             return P1.x < P2.x ? { P1, P2 } : { P1: P2, P2: P1 }

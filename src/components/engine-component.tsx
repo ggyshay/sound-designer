@@ -1,22 +1,26 @@
 import _ from 'lodash';
 import * as React from 'react';
-import { ConnectorMeta } from '../atoms';
-import { findNodeWithId } from '../utils/nodeOperations';
-import { CardNode } from './canvas';
+import { Subscribe } from 'unstated';
+import { ConnectionMeta, ConnectorMeta } from '../atoms';
 import { AudioEngine } from '../atoms/audio-engine';
+import { CardNodeProvider } from '../providers/card-node.provider';
+import { ConnectionProvider } from '../providers/connection.provider';
+import { CardNode } from './canvas';
 
 
 export interface EngineComponentProps {
     type: string;
     connect: { Outp: ConnectorMeta, Inp: ConnectorMeta };
-    connectionCallback: () => void;
     ctx: AudioContext;
     connectorsCreateCB: (connectors: ConnectorMeta[], id: string, engine: AudioEngine) => void
-    nodes: CardNode[];
+    nodeId: string;
 }
 
 export class EngineComponent extends React.Component<EngineComponentProps, any> {
     private engine: AudioEngine = null;
+    private cardNodeProvider: CardNodeProvider = null;
+    private connectionProvider: ConnectionProvider = null;
+
     constructor(props: EngineComponentProps) {
         super(props);
         this.state = {
@@ -25,10 +29,11 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
             connectors: [],
         }
         this.engine = new AudioEngine(this.props.ctx, this.props.type);
-        this.engine.setup();
+        this.setup();
     }
     componentWillMount() { this.createConnectors(); }
     componentDidUpdate() { if (this.props.connect) this.checkConnect(); }
+    componentDidMount() { this.updateProviderData(); }
 
     render() {
         const { children } = this.props;
@@ -39,7 +44,22 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
                 onParamChange: this.handleParamChange,
             }));
 
-        return <div>{childrenWithProps}</div>
+        return (
+            <Subscribe to={[CardNodeProvider, ConnectionProvider]}>
+                {(cnc: CardNodeProvider, cp: ConnectionProvider) => {
+                    this.cardNodeProvider = cnc;
+                    this.connectionProvider = cp;
+
+                    return <div>{childrenWithProps}</div>
+                }}
+            </Subscribe>
+        );
+    }
+
+    updateProviderData = () => {
+        const node = this.cardNodeProvider.getNodeWithId(this.props.nodeId);
+        node.engine = this.engine;
+        this.cardNodeProvider.updateNode(node, node.id);
     }
 
     checkConnect = () => {
@@ -47,23 +67,40 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
         if (this.props.connect.Outp && this.props.connect.Inp) {
             if (!this.areConnected(this.props.connect.Inp, this.props.connect.Outp)) {
                 this.setState({ connect: this.props.connect })
-                this.connectEngines(findNodeWithId(this.props.connect.Outp.parentId, this.props.nodes),
-                    findNodeWithId(this.props.connect.Inp.parentId, this.props.nodes),
-                    this.props.connect.Outp.type, this.props.connect.Inp.type)
             } else {
-                this.props.connectionCallback();
+                this.connectionProvider.cleanConnection();
             }
         } else {
             this.setState({ connect: null })
         }
     }
 
-    connectEngines = (outNode: CardNode, inNode: CardNode, outParameter: string, inParameter: string) => {
+    connectEngines = (inNode: CardNode, outParameter: string, inParameter: string) => {
         this.engine.connect(inNode.engine, outParameter, inParameter);
     }
 
+    renewConnections = () => {
+        const node = this.cardNodeProvider.getNodeWithId(this.props.nodeId);
+        node.connectors.forEach(cn => {
+            if (!cn.isOutp) { return }
+            cn.connections.forEach(conn => {
+                const inNode = this.cardNodeProvider.getNodeWithId(conn.parentId);
+                const inCon = inNode.connectors.find(inCn => inCn.id === conn.id);
+                this.connectEngines(inNode, cn.type, inCon.type);
+            });
+        })
+    }
+
+    setup = () => {
+        this.engine.setup();
+    }
+
+    tryStart = (time?: number) => {
+        this.engine.start(time);
+    }
+
     areConnected = (inCon: ConnectorMeta, outCon: ConnectorMeta) => {
-        return !!outCon.connections.find((cn: ConnectorMeta) => (cn.id === inCon.id));
+        return !!outCon.connections.find((cn: ConnectionMeta) => (cn.id === inCon.id));
     }
 
     createConnectors = () => {
@@ -76,7 +113,7 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
                 connectors = { inputs: ['InSignal', 'cutoff', 'resonance'], outputs: ['OutSignal'] }
                 break;
             case 'Envelope':
-                connectors = { inputs: ['Attack', 'Decay', 'Sustain', 'Release', 'InSignal'], outputs: ['OutSignal'] }
+                connectors = { inputs: ['InSignal'], outputs: ['OutSignal'] }
                 break;
             default:
                 connectors = { inputs: ['frequency'], outputs: ['OutSignal'] }

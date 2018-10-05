@@ -1,8 +1,9 @@
 import * as React from 'react';
-import './connector.css'
+import { Subscribe } from 'unstated';
+import { CardNodeProvider } from '../providers/card-node.provider';
 import { Bezier } from './';
-import { CardNode } from '../components';
 import { ConnectorMeta } from './card';
+import './connector.css';
 
 export interface ConnectorProps {
     Position: { x: number, y: number }
@@ -14,38 +15,81 @@ export interface ConnectorProps {
     parentY: number; // TODO: change to ParentPosition
     parentId: string;
     id: string;
-    connections?: any;
-    nodes?: CardNode[];
+    connections?: { id: string, parentId: string }[];
     type: string;
+}
+
+export type ConnectionMeta = {
+    id: string;
+    parentId: string;
 }
 
 export class Connector extends React.Component<ConnectorProps, any>{
     public metadata = null;
+    private cardNodeProvider: CardNodeProvider = null;
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            selected: {}
+        }
+    }
+
     render() {
         const { dx, dy, x0, y0 } = this.getSVGSize();
         return (
-            <div>
-                <div className="connector"
-                    style={{ left: this.props.Position.x, top: this.props.Position.y}}
-                    onMouseDown={e => this.handleConnectorDrag(e)}
-                    onMouseOver={e => this.handleConnectorDetected(e)}
-                    onMouseLeave={this.handleConnectorLost}
-                ></div>
-                {this.props.connections &&
-                    <svg style={{ position: 'fixed', left: x0, top: y0, pointerEvents: 'none', zIndex: -10 }}
-                        width={dx} height={dy} viewBox={`0 0 ${dx} ${dy}`}>
-                        {this.props.connections.map(cn => {
-                            const bx0 = this.props.Position.x - x0 + 7, by0 = this.props.Position.y - y0 + 7,
-                                bx1 = cn.Position.x - x0 + 7, by1 = cn.Position.y - y0 + 7;
-                            return (
-                                <Bezier P1={{ x: bx0, y: by0 }} P2={{ x: bx1, y: by1 }}
-                                key={this.props.id + cn.id}/>)
-                        })}
-                    </svg>
-                }
+            <Subscribe to={[CardNodeProvider]}>
+                {(cardNodeProvider: CardNodeProvider) => {
+                    this.cardNodeProvider = cardNodeProvider;
 
-            </div>
+                    return (
+                        <div>
+                            <div className="connector"
+                                style={{ left: this.props.Position.x, top: this.props.Position.y }}
+                                onMouseDown={e => this.handleConnectorDrag(e)}
+                                onMouseOver={e => this.handleConnectorDetected(e)}
+                                onMouseLeave={this.handleConnectorLost}
+                            ></div>
+                            {this.props.connections &&
+                                <svg style={{ position: 'fixed', left: x0, top: y0, pointerEvents: 'none', zIndex: -10 }}
+                                    width={dx} height={dy} viewBox={`0 0 ${dx} ${dy}`}>
+                                    {this.props.connections.map((connection: ConnectionMeta) => {
+                                        const cn = this.getConnector(connection);
+                                        const bx0 = this.props.Position.x - x0 + 7, by0 = this.props.Position.y - y0 + 7,
+                                            bx1 = cn.Position.x - x0 + 7, by1 = cn.Position.y - y0 + 7;
+                                        return (
+                                            <Bezier P1={{ x: bx0, y: by0 }} P2={{ x: bx1, y: by1 }}
+                                                key={this.props.id + cn.id}
+                                                selected={this.state.selected.destId === cn.id}
+                                                onClick={e => this.handleSelectCurve(e, cn.id)}
+                                                onDoubleClick={e => this.handleDeleteCurve(e, cn.id)}
+                                            />)
+                                    })}
+                                </svg>
+                            }
+                        </div>
+                    );
+                }}
+            </Subscribe>
+
         );
+    }
+
+    handleCanvasClick = e => {
+        console.log('canvas click ', e)
+    }
+
+    handleSelectCurve = (e, destId) => {
+        console.log('selected ', destId)
+        if (destId === this.state.selected.destId) {
+            this.setState({ selected: {} })
+        } else {
+            this.setState({ selected: { destId } })
+        }
+    }
+
+    handleDeleteCurve = (e, destId) => {
+        console.log('delete')
     }
 
     handleConnectorLost = e => {
@@ -73,14 +117,20 @@ export class Connector extends React.Component<ConnectorProps, any>{
             parentX: this.props.parentX,
             parentY: this.props.parentY,
             type: this.props.type
-        })
+        });
+    }
+
+    getConnector = (connection: ConnectionMeta) => {
+        const node = this.cardNodeProvider.getNodeWithId(connection.parentId);
+        return node.connectors.find((c) => c.id === connection.id);
     }
 
     private getSVGSize = () => {
         let maxX = this.props.Position.x, maxY = this.props.Position.y,
             minX = this.props.Position.x, minY = this.props.Position.y;
 
-        this.props.connections.forEach(cn => {
+        this.props.connections.forEach((connection: { id: string, parentId: string }) => {
+            const cn = this.getConnector(connection);
             maxX = cn.Position.x > maxX ? cn.Position.x : maxX;
             minX = cn.Position.x < minX ? cn.Position.x : minX;
             maxY = cn.Position.y > maxY ? cn.Position.y : maxY;

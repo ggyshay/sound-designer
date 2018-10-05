@@ -1,43 +1,41 @@
 import * as React from 'react';
+import { Subscribe } from 'unstated';
 import { Card, ConnectorMeta } from '../atoms';
 import { AudioEngine } from '../atoms/audio-engine';
-import { findNodeWithId } from '../utils/nodeOperations';
+import { CardNodeProvider } from '../providers/card-node.provider';
 import { ComponentMenu } from './component-menu';
 import { EngineComponent } from './engine-component';
-
-
-
 
 export interface CanvasProps {
     onConnectorDrag: (metadata: any) => void;
     onConnectorDetected: (metadata: any) => void;
     onConnectorLost: (e: any) => void;
     currentConnection: { Inp: any, Outp: any };
-    connectionCallback: () => void;
 }
 
 export interface CardNode {
     x: number;
     y: number;
-    id: string;
+    id?: string;
     type: string;
     connectors: ConnectorMeta[];
     engine: AudioEngine;
+    engRef?: React.RefObject<EngineComponent>;
 }
 
 export interface CanvasState {
-    nodes: CardNode[];
     draggingId: string | null;
     draggingPoint: { x: number, y: number } | null;
 }
 
 export class Canvas extends React.Component<CanvasProps, CanvasState> {
     private ctx: AudioContext;
+    private nodeProvider: CardNodeProvider;
+
     constructor(props) {
         super(props);
         this.ctx = new AudioContext;
         this.state = {
-            nodes: [{ x: 500, y: 300, id: 'Output', type: 'Output', connectors: [], engine: null }],
             draggingId: null,
             draggingPoint: null
         };
@@ -47,40 +45,48 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         const Outp = this.props.currentConnection.Outp;
         const Inp = this.props.currentConnection.Inp;
         return (
-            <div className="App" onDragOver={(e) => this.handleDragOver(e)} onDrop={e => this.handleDrop(e)}
-                onMouseUp={this.handleMouseUp}>
-                {this.state.nodes.map((n: CardNode) => {
-                    return (<EngineComponent
-                        connect={Outp && Inp && (n.id === Outp.parentId ? { Outp, Inp } : null)}
-                        connectionCallback={this.props.connectionCallback}
-                        type={n.type}
-                        ctx={this.ctx}
-                        connectorsCreateCB={this.handleCreateEngine}
-                        nodes={this.state.nodes}
-                    >
-                        <Card
-                            Position={{ x: n.x, y: n.y }}
-                            connectionCallback={this.props.connectionCallback}
-                            nodes={this.state.nodes}
-                            type={n.type}
-                            handleCardDrag={this.handleCardDrag}
-                            onConnectorDrag={this.props.onConnectorDrag}
-                            onConnectorDetected={this.props.onConnectorDetected}
-                            onConnectorLost={this.props.onConnectorLost}
-                            key={n.id}
-                            id={n.id}
-                        />
-                    </EngineComponent>
-
-                    );
-                })}
-
-
-
-                <ComponentMenu handleDrag={this.handleDragStart} />
-            </div>
+            <Subscribe to={[CardNodeProvider]}>
+                {(nodeProvider: CardNodeProvider) => {
+                    this.nodeProvider = nodeProvider
+                    return (
+                        <div id="canvas" className="App" onDragOver={(e) => this.handleDragOver(e)} onDrop={e => this.handleDrop(e)}
+                            onMouseUp={this.handleMouseUp}>
+                            {this.nodeProvider.state.nodes.map((n: CardNode) => {
+                                return (<EngineComponent
+                                    connect={Outp && Inp && (n.id === Outp.parentId ? { Outp, Inp } : null)}
+                                    type={n.type}
+                                    ctx={this.ctx}
+                                    connectorsCreateCB={this.handleCreateEngine}
+                                    nodeId={n.id}
+                                    ref={n.engRef}
+                                >
+                                    <Card
+                                        Position={{ x: n.x, y: n.y }}
+                                        type={n.type}
+                                        handleCardDrag={this.handleCardDrag}
+                                        onConnectorDrag={this.props.onConnectorDrag}
+                                        onConnectorDetected={this.props.onConnectorDetected}
+                                        onConnectorLost={this.props.onConnectorLost}
+                                        key={n.id}
+                                        id={n.id}
+                                    />
+                                </EngineComponent>
+                                );
+                            })}
+                            <button onClick={() => this.nodeProvider.renewConnections()}>Trigger</button>
+                            <ComponentMenu handleDrag={this.handleDragStart} />
+                        </div>
+                    )
+                }}
+            </Subscribe>
         );
     }
+
+    // handleRef = (r, id) => {
+    //     const node = this.nodeProvider.getNodeWithId(id);
+    //     node.engRef = r;
+    //     this.nodeProvider.updateNode(node, id);
+    // }
 
     handleCardDrag = (e: MouseEvent, id: string) => {
         document.addEventListener('mousemove', this.onMouseMove);
@@ -88,8 +94,8 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     onMouseMove = (e: MouseEvent) => {
-        const nodes = this.state.nodes.slice(0)
-        const node = findNodeWithId(this.state.draggingId, nodes);
+        const nodes = this.nodeProvider.state.nodes.slice(0)
+        const node = this.nodeProvider.getNodeWithId(this.state.draggingId);
         const deltaX = e.pageX - this.state.draggingPoint.x;
         const deltaY = e.pageY - this.state.draggingPoint.y;
         node.x += deltaX;
@@ -98,7 +104,8 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             cn.Position.x += deltaX;
             cn.Position.y += deltaY;
         });
-        this.setState({ nodes, draggingPoint: { x: e.pageX, y: e.pageY } });
+        this.nodeProvider.updateNodes(nodes);
+        this.setState({ draggingPoint: { x: e.pageX, y: e.pageY } });
     }
 
     handleMouseUp = () => {
@@ -112,23 +119,22 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     handleDrop = (e: any) => {
         const type = e.dataTransfer.getData('nodeType');
-        const nodes = this.state.nodes.slice(0);
         const node = {
-            x: e.pageX, y: e.pageY, id: type + nodes.length, type,
+            x: e.pageX, y: e.pageY, type,
             connectors: [],
             engine: null,
+            engRef: React.createRef<EngineComponent>()
         };
-        nodes.push(node);
-        this.setState({ nodes })
+        this.nodeProvider.pushNode(node);
     }
 
     handleDragOver = e => { e.preventDefault(); }
 
     handleCreateEngine = (connectors: ConnectorMeta[], id: string, engine: AudioEngine) => {
-        const nodes = this.state.nodes.slice(0);
-        const node = findNodeWithId(id, nodes);
+        const nodes = this.nodeProvider.state.nodes.slice(0);
+        const node = this.nodeProvider.getNodeWithId(id);
         node.engine = engine;
         node.connectors = connectors.slice(0);
-        this.setState({ nodes });
+        this.nodeProvider.updateNodes(nodes);
     }
 }

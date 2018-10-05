@@ -2,8 +2,8 @@
     position: fixed;
     background-color: #DA0027;
     border-radius: 100%;
-    width:1em;
-    height:1em;
+    width:1rem;
+    height:1rem;
     box-sizing: border-box;
     border: 2px solid #202020
 }
