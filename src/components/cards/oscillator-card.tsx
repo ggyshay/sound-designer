@@ -5,6 +5,7 @@ import { OscillatorTypes } from '../../atoms/audio-engine';
 import { CardNodeProvider } from '../../providers/card-node.provider';
 import { ConnectionProvider } from '../../providers/connection.provider';
 import './cards.css';
+import { SelectionProvider } from '../../providers/selection.provider';
 
 
 export interface CardComponentProps {
@@ -22,12 +23,15 @@ export interface CardComponentProps {
 export class OscillatorCard extends React.Component<CardComponentProps, any>{
     private cardNodeProvider: CardNodeProvider = null;
     private connectionProvider: ConnectionProvider = null;
+    private selectionProvider: SelectionProvider = null;
 
     constructor(props) {
         super(props);
         this.state = {
             connectors: [],
         }
+
+        document.addEventListener('keydown', this.handleKeyDown)
     }
 
     componentDidMount() { this.setupConnectors(); }
@@ -56,10 +60,11 @@ export class OscillatorCard extends React.Component<CardComponentProps, any>{
 
     render() {
         return (
-            <Subscribe to={[CardNodeProvider, ConnectionProvider]} >
-                {(nodeProvider: CardNodeProvider, connectionProvider: ConnectionProvider) => {
+            <Subscribe to={[CardNodeProvider, ConnectionProvider, SelectionProvider]} >
+                {(nodeProvider: CardNodeProvider, connectionProvider: ConnectionProvider, selectionProvider: SelectionProvider) => {
                     this.cardNodeProvider = nodeProvider;
                     this.connectionProvider = connectionProvider;
+                    this.selectionProvider = selectionProvider;
 
                     return (
                         <div>
@@ -111,6 +116,20 @@ export class OscillatorCard extends React.Component<CardComponentProps, any>{
             this.connectionProvider.cleanConnection();
             this.cardNodeProvider.updateNode(node, node.id);
             this.cardNodeProvider.renewConnections();
+        }
+    }
+
+    handleKeyDown = e => {
+        if (e.key === 'Backspace' && (this.selectionProvider.state.parentId === this.props.id)) {
+            const connectors = this.state.connectors.slice(0);
+            connectors.forEach((cn: ConnectorMeta) => {
+                if (cn.id === this.selectionProvider.state.id) {
+                    const index = cn.connections.findIndex(cnn => cnn.id === this.selectionProvider.state.destId);
+                    cn.connections.splice(index, 1);
+                    this.selectionProvider.cleanSelection();
+                }
+            });
+            this.setState({ connectors })
         }
     }
 }

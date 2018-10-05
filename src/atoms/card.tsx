@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { Subscribe } from 'unstated';
 import { EnvelopeCard, FilterCard } from '../components/cards';
 import { OscillatorCard } from '../components/cards/oscillator-card';
 import { OutputCard } from '../components/cards/output-card';
-import { CardNodeProvider } from '../providers/card-node.provider';
 import './card.css';
 
 export interface CardProps {
@@ -31,33 +29,14 @@ export type ConnectorMeta = {
     type: string,
 }
 
-export interface CardState {
-
-}
-
-export class Card extends React.Component<CardProps, CardState> {
-    private cardNodeProvider: CardNodeProvider = null;
-    constructor(props: CardProps) {
-        super(props);
-        this.state = {
-            connectors: [],
-        }
-    }
+export class Card extends React.Component<CardProps> {
 
     public render() {
         return (
-            <Subscribe to={[CardNodeProvider]}>
-                {(cnc: CardNodeProvider) => {
-                    this.cardNodeProvider = cnc;
-                    return (
-                        <div className="card-holder" style={{ left: this.props.Position.x, top: this.props.Position.y }}>
-                            {this.renderCards()}
-                        </div>
-                    )
-                }}
-            </Subscribe>
-        );
-
+            <div className="card-holder" style={{ left: this.props.Position.x, top: this.props.Position.y }}>
+                {this.renderCards()}
+            </div>
+        )
     }
 
     handleCardDrag = e => {

@@ -4,6 +4,7 @@ import { CardNodeProvider } from '../providers/card-node.provider';
 import { Bezier } from './';
 import { ConnectorMeta } from './card';
 import './connector.css';
+import { SelectionProvider } from '../providers/selection.provider';
 
 export interface ConnectorProps {
     Position: { x: number, y: number }
@@ -27,6 +28,8 @@ export type ConnectionMeta = {
 export class Connector extends React.Component<ConnectorProps, any>{
     public metadata = null;
     private cardNodeProvider: CardNodeProvider = null;
+    private selectionProvider: SelectionProvider = null;
+
     constructor(props) {
         super(props);
 
@@ -38,10 +41,10 @@ export class Connector extends React.Component<ConnectorProps, any>{
     render() {
         const { dx, dy, x0, y0 } = this.getSVGSize();
         return (
-            <Subscribe to={[CardNodeProvider]}>
-                {(cardNodeProvider: CardNodeProvider) => {
+            <Subscribe to={[CardNodeProvider, SelectionProvider]}>
+                {(cardNodeProvider: CardNodeProvider, selectionProvider: SelectionProvider) => {
                     this.cardNodeProvider = cardNodeProvider;
-
+                    this.selectionProvider = selectionProvider;
                     return (
                         <div>
                             <div className="connector"
@@ -60,8 +63,8 @@ export class Connector extends React.Component<ConnectorProps, any>{
                                         return (
                                             <Bezier P1={{ x: bx0, y: by0 }} P2={{ x: bx1, y: by1 }}
                                                 key={this.props.id + cn.id}
-                                                selected={this.state.selected.destId === cn.id}
-                                                onClick={e => this.handleSelectCurve(e, cn.id)}
+                                                selected={this.selectionProvider.isSelected(this.props.id, cn.id)}
+                                                onClick={() => this.handleSelectCurve(cn)}
                                                 onDoubleClick={e => this.handleDeleteCurve(e, cn.id)}
                                             />)
                                     })}
@@ -71,21 +74,12 @@ export class Connector extends React.Component<ConnectorProps, any>{
                     );
                 }}
             </Subscribe>
-
         );
     }
 
-    handleCanvasClick = e => {
-        console.log('canvas click ', e)
-    }
 
-    handleSelectCurve = (e, destId) => {
-        console.log('selected ', destId)
-        if (destId === this.state.selected.destId) {
-            this.setState({ selected: {} })
-        } else {
-            this.setState({ selected: { destId } })
-        }
+    handleSelectCurve = (cn: ConnectorMeta) => {
+        this.selectionProvider.select(this.props.id, cn.id, this.props.parentId, cn.parentId)
     }
 
     handleDeleteCurve = (e, destId) => {

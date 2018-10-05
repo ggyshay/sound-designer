@@ -6,6 +6,7 @@ import { AudioEngine } from '../atoms/audio-engine';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { ConnectionProvider } from '../providers/connection.provider';
 import { CardNode } from './canvas';
+import { SelectionProvider } from '../providers/selection.provider';
 
 
 export interface EngineComponentProps {
@@ -20,6 +21,7 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     private engine: AudioEngine = null;
     private cardNodeProvider: CardNodeProvider = null;
     private connectionProvider: ConnectionProvider = null;
+    private selectionProvider: SelectionProvider = null;
 
     constructor(props: EngineComponentProps) {
         super(props);
@@ -30,6 +32,7 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
         }
         this.engine = new AudioEngine(this.props.ctx, this.props.type);
         this.setup();
+        document.addEventListener('keydown', this.handleKeyDown)
     }
     componentWillMount() { this.createConnectors(); }
     componentDidUpdate() { if (this.props.connect) this.checkConnect(); }
@@ -45,15 +48,30 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
             }));
 
         return (
-            <Subscribe to={[CardNodeProvider, ConnectionProvider]}>
-                {(cnc: CardNodeProvider, cp: ConnectionProvider) => {
+            <Subscribe to={[CardNodeProvider, ConnectionProvider, SelectionProvider]}>
+                {(cnc: CardNodeProvider, cp: ConnectionProvider, sp: SelectionProvider) => {
                     this.cardNodeProvider = cnc;
                     this.connectionProvider = cp;
+                    this.selectionProvider = sp;
 
                     return <div>{childrenWithProps}</div>
                 }}
             </Subscribe>
         );
+    }
+
+    handleKeyDown = e => {
+        if (e.key === 'Backspace' && (this.selectionProvider.state.parentId === this.props.nodeId)) {
+            if (this.selectionProvider.isNode()) {
+                // TODO: delete node 
+            } else {
+                const inNode = this.cardNodeProvider.getNodeWithId(this.selectionProvider.state.destParentId);
+                const inCon = inNode.connectors.find(inCn => inCn.id === this.selectionProvider.state.destId);
+                const outNode = this.cardNodeProvider.getNodeWithId(this.props.nodeId);
+                const outCon = outNode.connectors.find(cn => cn.id === this.selectionProvider.state.id);
+                this.engine.disconnect(inNode.engine, outCon.type, inCon.type)
+            }
+        }
     }
 
     updateProviderData = () => {
