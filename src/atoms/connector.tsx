@@ -58,6 +58,7 @@ export class Connector extends React.Component<ConnectorProps, any>{
                                     width={dx} height={dy} viewBox={`0 0 ${dx} ${dy}`}>
                                     {this.props.connections.map((connection: ConnectionMeta) => {
                                         const cn = this.getConnector(connection);
+                                        if(!cn) return null;
                                         const bx0 = this.props.Position.x - x0 + 7, by0 = this.props.Position.y - y0 + 7,
                                             bx1 = cn.Position.x - x0 + 7, by1 = cn.Position.y - y0 + 7;
                                         return (
@@ -65,7 +66,6 @@ export class Connector extends React.Component<ConnectorProps, any>{
                                                 key={this.props.id + cn.id}
                                                 selected={this.selectionProvider.isSelected(this.props.id, cn.id)}
                                                 onClick={() => this.handleSelectCurve(cn)}
-                                                onDoubleClick={e => this.handleDeleteCurve(e, cn.id)}
                                             />)
                                     })}
                                 </svg>
@@ -80,10 +80,6 @@ export class Connector extends React.Component<ConnectorProps, any>{
 
     handleSelectCurve = (cn: ConnectorMeta) => {
         this.selectionProvider.select(this.props.id, cn.id, this.props.parentId, cn.parentId)
-    }
-
-    handleDeleteCurve = (e, destId) => {
-        console.log('delete')
     }
 
     handleConnectorLost = e => {
@@ -116,6 +112,7 @@ export class Connector extends React.Component<ConnectorProps, any>{
 
     getConnector = (connection: ConnectionMeta) => {
         const node = this.cardNodeProvider.getNodeWithId(connection.parentId);
+        if(!node) return null;
         return node.connectors.find((c) => c.id === connection.id);
     }
 
@@ -125,6 +122,7 @@ export class Connector extends React.Component<ConnectorProps, any>{
 
         this.props.connections.forEach((connection: { id: string, parentId: string }) => {
             const cn = this.getConnector(connection);
+            if(!cn) return null;
             maxX = cn.Position.x > maxX ? cn.Position.x : maxX;
             minX = cn.Position.x < minX ? cn.Position.x : minX;
             maxY = cn.Position.y > maxY ? cn.Position.y : maxY;

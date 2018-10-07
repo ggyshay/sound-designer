@@ -6,7 +6,6 @@ export interface BezierProps {
     P2: { x: number, y: number }
     selected: boolean;
     onClick: (e) => void;
-    onDoubleClick: (e) => void;
 }
 
 export class Bezier extends React.Component<BezierProps> {
@@ -16,7 +15,6 @@ export class Bezier extends React.Component<BezierProps> {
         const classname = "curve" + (this.props.selected ? ' selected' : '')
         return instructions ? (
             <path
-                onDoubleClick={this.props.onDoubleClick}
                 onClick={this.props.onClick}
                 d={instructions}
                 className={classname}

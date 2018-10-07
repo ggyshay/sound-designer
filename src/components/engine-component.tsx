@@ -61,16 +61,21 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     }
 
     handleKeyDown = e => {
-        if (e.key === 'Backspace' && (this.selectionProvider.state.parentId === this.props.nodeId)) {
-            if (this.selectionProvider.isNode()) {
-                // TODO: delete node 
+        if (!(e.key === 'Backspace')) return;
+        if (this.selectionProvider.isNode()) {
+            if (this.selectionProvider.state.id === this.props.nodeId) {
+                // remove all connections and try stop engine
+                this.engine.disconnect();
             } else {
-                const inNode = this.cardNodeProvider.getNodeWithId(this.selectionProvider.state.destParentId);
-                const inCon = inNode.connectors.find(inCn => inCn.id === this.selectionProvider.state.destId);
-                const outNode = this.cardNodeProvider.getNodeWithId(this.props.nodeId);
-                const outCon = outNode.connectors.find(cn => cn.id === this.selectionProvider.state.id);
-                this.engine.disconnect(inNode.engine, outCon.type, inCon.type)
+                //look for connection with the selcted node and disconnect
             }
+        }
+        else if (this.selectionProvider.state.parentId === this.props.nodeId) {
+            const inNode = this.cardNodeProvider.getNodeWithId(this.selectionProvider.state.destParentId);
+            const inCon = inNode.connectors.find(inCn => inCn.id === this.selectionProvider.state.destId);
+            const outNode = this.cardNodeProvider.getNodeWithId(this.props.nodeId);
+            const outCon = outNode.connectors.find(cn => cn.id === this.selectionProvider.state.id);
+            this.engine.disconnect(inNode.engine, outCon.type, inCon.type)
         }
     }
 

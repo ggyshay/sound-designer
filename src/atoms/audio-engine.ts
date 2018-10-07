@@ -75,7 +75,7 @@ export class AudioEngine {
                 break;
         }
     }
-    connect (inEngine: AudioEngine, outParameter: string, inParameter: string) {
+    connect(inEngine: AudioEngine, outParameter: string, inParameter: string) {
         // this is breaking because inEngine is sometimes an audio param:
         // overide fn to accept audioParam as parameter
         if (outParameter === 'OutSignal' && inParameter === "InSignal") {
@@ -89,7 +89,12 @@ export class AudioEngine {
         }
     }
 
-    disconnect = (inEngine: AudioEngine, outParameter: string, inParameter: string) => {
+    disconnect = (inEngine?: AudioEngine, outParameter?: string, inParameter?: string) => {
+        if (!inEngine) {
+            this.engine.disconnect();
+            return;
+        }
+        
         if (outParameter === 'OutSignal' && inParameter === "InSignal") {
             this.engine.disconnect(inEngine.engine);
         } else if (outParameter === 'OutSignal') {
@@ -107,7 +112,6 @@ export class AudioEngine {
 
     changeParam = (param: string, value: string | number) => {
         if (!this.engine) { return }
-        debugger;
         if (this.type === 'Envelope' && typeof value === 'number') {
             this.envParams[param] = value / 1000;
         } else if (this.engine[param]) {

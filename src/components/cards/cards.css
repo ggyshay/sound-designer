@@ -5,7 +5,7 @@
     background-color: #3F3F3F;
 }
 
-.card-header{
+.card-header {
     background-color: #e9e9e9;
     padding: 0.4rem;
     overflow-x: hide;
@@ -19,7 +19,6 @@
     margin: 0;
     pointer-events: 'none';
 }
-
 
 .card-display {
     background-color: #202020;
@@ -40,7 +39,7 @@
     color: white;
 }
 
-.output-card{
+.output-card {
     position: fixed;
     width: 80px;
     height: 80px;
@@ -50,7 +49,7 @@
 }
 
 .output-card img {
-    position:relative;
+    position: relative;
     left: 20px;
     top: 17px
 }
@@ -59,4 +58,8 @@
     display: flex;
     justify-content: space-around;
     flex-direction: row;
+}
+
+.selected {
+    border: 1px solid #e9e9e9;
 }

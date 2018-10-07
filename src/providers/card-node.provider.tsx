@@ -14,6 +14,13 @@ export class CardNodeProvider extends Container<CardNodeProviderState> {
         this.state = { nodes: [{ x: 500, y: 300, id: 'Output', type: 'Output', connectors: [], engine: null, engRef: React.createRef<EngineComponent>() },] };
     }
 
+    removeNodeWithId = (id: string) => {
+        const nodes = this.state.nodes.slice(0);
+        const index = nodes.findIndex(n => n.id === id);
+        nodes.splice(index, 1);
+        this.updateNodes(nodes);
+    }
+
     getNodeWithId = (id): CardNode => {
         return this.state.nodes.find((n: CardNode) => n.id === id);
     }

@@ -1,56 +1,34 @@
 import * as React from 'react';
-import { CardComponentProps } from './oscillator-card';
+import { Subscribe } from 'unstated';
 import { Connector } from '../../atoms';
 import { FilterTypes } from '../../atoms/audio-engine';
 import { Knob } from '../../atoms/knob';
-import { CardNodeProvider } from '../../providers/card-node.provider';
-import { Subscribe } from 'unstated';
+import { SelectionProvider } from '../../providers/selection.provider';
+import { CardComponentProps } from './oscillator-card';
 
 export class FilterCard extends React.Component<CardComponentProps, any>{
     private width = 205;
     private height = 285;
 
-    private cardNodeProvider: CardNodeProvider = null;
+    private selectionProvider: SelectionProvider = null;
 
     constructor(props) {
         super(props);
 
         this.state = {
             frequency: 20,
-            Q: 1,
-            connectors: []
+            Q: 1
         }
-    }
-
-    componentDidMount() { this.setupConnectors(); }
-    setupConnectors = () => {
-        const { Position: { x, y }, id, connectors: { inputs, outputs } } = this.props
-        const connectors = []
-        inputs.map((inp, idx) => {
-            connectors.push({
-                Position: { x: x - 7, y: y + 50 + idx * 30 }, isOutp: false,
-                id: id + inp, parentX: x, parentY: y, parentId: id, connections: [], type: inp
-            })
-        })
-        outputs.map((outp, idx) => {
-            connectors.push({
-                Position: { x: x + this.width - 7, y: y + 50 + idx * 30 }, isOutp: true,
-                id: id + outp, parentX: x, parentY: y, parentId: id, connections: [], type: outp
-            })
-        })
-        const node = this.cardNodeProvider.getNodeWithId(this.props.id);
-        node.connectors = connectors;
-        this.cardNodeProvider.updateNode(node, this.props.id);
-        this.setState({ connectors });
     }
     render() {
         return (
-            <Subscribe to={[CardNodeProvider]}>{
-                (cnc: CardNodeProvider) => {
-                    this.cardNodeProvider = cnc;
+            <Subscribe to={[SelectionProvider]}>{
+                (sp: SelectionProvider) => {
+                    this.selectionProvider = sp;
+                    const classname = 'card' + (this.selectionProvider.isSelected(this.props.id) ? ' selected' : '')
                     return (
                         <div>
-                            {this.state.connectors.map(cn => {
+                            {this.props.connectors.map(cn => {
                                 return (
                                     <Connector
                                         parentX={this.props.Position.x}
@@ -68,9 +46,9 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
                                     />
                                 )
                             })}
-                            <div className="card" onMouseDown={this.props.handleCardDrag}
+                            <div className={classname} onMouseDown={this.props.handleCardDrag}
                                 style={{ width: this.width, height: this.height }}>
-                                <div className="card-header unselectable">
+                                <div className="card-header unselectable" onClick={this.props.onCardClick}>
                                     <p>Filter</p>
                                 </div>
                                 <div className="card-display"></div>
