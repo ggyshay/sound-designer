@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Subscribe } from 'unstated';
-import { Connector, ConnectorMeta } from '../../atoms';
+import { Connector, ConnectorMeta, DisplayComponent } from '../../atoms';
 import { OscillatorTypes } from '../../atoms/audio-engine';
 import { SelectionProvider } from '../../providers/selection.provider';
 import './cards.css';
+import { Waveforms } from '../../atoms/waveforms';
 
 export interface CardComponentProps {
     onParamChange: (param: string, value: string | number) => void;
@@ -18,8 +19,14 @@ export interface CardComponentProps {
     onCardClick: (e: any) => void;
 }
 
-export class OscillatorCard extends React.Component<CardComponentProps>{
+export class OscillatorCard extends React.Component<CardComponentProps, any>{
     private selectionProvider: SelectionProvider = null;
+    constructor(props) {
+        super(props);
+        this.state = {
+            type: 'sine',
+        }
+    }
 
     render() {
         return (
@@ -51,8 +58,8 @@ export class OscillatorCard extends React.Component<CardComponentProps>{
                                 <div className="card-header unselectable" onClick={this.props.onCardClick}>
                                     <p>Oscillator</p>
                                 </div>
-                                <div className="card-display"></div>
-                                <select className="source-selector" onChange={(e) => this.props.onParamChange('type', e.target.value)}>
+                                <div className="card-display"><DisplayComponent data={Waveforms[this.state.type]} /></div>
+                                <select className="source-selector" onChange={this.handleTypeChange}>
                                     <option value={OscillatorTypes.sine}> Sine </option>
                                     <option value={OscillatorTypes.square}> Square </option>
                                     <option value={OscillatorTypes.saw}> Saw </option>
@@ -63,5 +70,11 @@ export class OscillatorCard extends React.Component<CardComponentProps>{
                 }}
             </Subscribe>
         )
+    }
+
+    handleTypeChange = e => {
+        console.log('change ', this.state.type, e.target.value)
+        this.setState({ type: e.target.value });
+        this.props.onParamChange('type', e.target.value)
     }
 }
