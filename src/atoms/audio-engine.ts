@@ -94,7 +94,7 @@ export class AudioEngine {
             this.engine.disconnect();
             return;
         }
-        
+
         if (outParameter === 'OutSignal' && inParameter === "InSignal") {
             this.engine.disconnect(inEngine.engine);
         } else if (outParameter === 'OutSignal') {
@@ -123,6 +123,14 @@ export class AudioEngine {
                 this.oscParams[param] = value;
             }
         }
+    }
+
+    getFrequencyResponse = (inputFrequencies) => {
+        if (!(this.engine instanceof BiquadFilterNode)) return;
+        const magResponse = new Float32Array(inputFrequencies.length);
+        const phaseResponse = new Float32Array(inputFrequencies.length);
+        this.engine.getFrequencyResponse(inputFrequencies, magResponse, phaseResponse);
+        return magResponse.filter(v => !isNaN(v));
     }
 }
 

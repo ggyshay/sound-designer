@@ -20,6 +20,7 @@ export interface CardProps {
     handleCardDrag: (e: any, id: string) => void;
     connectorsCreateCB?: (connectors: ConnectorMeta[], id: string) => void;
     onParamChange?: (param: string, value: string | number) => void;
+    getFrequencyResponse?: (inputFrequencies: Float32Array) => Float32Array;
 }
 
 export type ConnectorMeta = {
@@ -115,6 +116,7 @@ export class Card extends React.Component<CardProps, CardState> {
             onConnectorDetected: this.props.onConnectorDetected,
             onConnectorDrag: this.props.onConnectorDrag,
             onConnectorLost: this.props.onConnectorLost,
+            getFrequencyResponse: this.props.getFrequencyResponse,
         }
 
         switch (this.props.type) {

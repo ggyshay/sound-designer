@@ -24,12 +24,12 @@ export class DisplayComponent extends React.Component<DisplayComponentProps, any
         const width = this.node.getBoundingClientRect().width;
         const height = this.node.getBoundingClientRect().height;
         const y = d3.scaleLinear()
-            .domain([-1, 1]).range([height - 10, 10])
+            .domain([d3.min(this.props.data, d => d.y), d3.max(this.props.data, d => d.y)]).range([height - 10, 10])
         const x = d3.scaleLinear()
-            .domain([0, this.props.data.length]).range([0, width]);
+            .domain([d3.min(this.props.data, d => d.x), d3.max(this.props.data, d => d.x)]).range([0, width]);
         const lineGen = d3.line()
-            .x((d, i) => x(i))
-            .y(d => y(d))
+            .x((d) => x(d.x))
+            .y(d => y(d.y))
         const pathData = lineGen(this.props.data);
 
         if (_.isEqual(this.state.pathData, pathData)) return;

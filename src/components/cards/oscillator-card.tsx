@@ -17,6 +17,7 @@ export interface CardComponentProps {
     onConnectorLost: (e: any) => void;
     connect?: { Outp: ConnectorMeta, Inp: ConnectorMeta };
     onCardClick: (e: any) => void;
+    getFrequencyResponse?: (inputFrequencies: Float32Array) => Float32Array;
 }
 
 export class OscillatorCard extends React.Component<CardComponentProps, any>{

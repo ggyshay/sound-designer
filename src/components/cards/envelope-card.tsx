@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Subscribe } from 'unstated';
-import { Connector } from '../../atoms';
+import { Connector, DisplayComponent } from '../../atoms';
 import { Knob } from '../../atoms/knob';
 import { SelectionProvider } from '../../providers/selection.provider';
 import { CardComponentProps } from './oscillator-card';
@@ -19,6 +19,7 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
             decay: null,
             sustain: null,
             release: null,
+            displayValues: [],
         }
     }
 
@@ -53,7 +54,7 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
                                 <div className="card-header unselectable" onClick={this.props.onCardClick}>
                                     <p>Envelope</p>
                                 </div>
-                                <div className="card-display"></div>
+                                <div className="card-display"><DisplayComponent data={this.state.displayValues} /></div>
                                 <div className="knob-pannel">
                                     <Knob
                                         style={{ display: "inline-block" }}
@@ -100,8 +101,28 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
         );
     }
 
+    createDisplay = () => {
+        const { attack, sustain, decay, release } = this.state;
+        if (!(attack && sustain && decay && release)) return;
+
+        let displayValues = [];
+        displayValues.push({ x: 0, y: 0 });
+        displayValues.push({ x: attack, y: 1000 });
+        displayValues.push({ x: attack + decay, y: sustain });
+        displayValues.push({ x: attack + 3 * decay, y: sustain });
+
+        const alpha = (-1 / release) * Math.log(0.001 / sustain);
+        const step = release / 20;
+        for (let i = 1; i < 20; i++) {
+            const y = sustain * Math.exp(-alpha * i * step)
+            displayValues.push({ x: i * step + attack + 3 * decay, y });
+        }
+        this.setState({ displayValues });
+    }
+
     handleParamChange = (name: string, value: number) => {
         this.props.onParamChange(name, value);
         this.setState({ [name]: value });
+        this.createDisplay();
     }
 }

@@ -45,6 +45,7 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
                 connectors: this.state.connectors, connect: this.state.connect,
                 connectorsCreateCB: (connectors: ConnectorMeta[], id: string) => this.props.connectorsCreateCB(connectors, id, this.engine),
                 onParamChange: this.handleParamChange,
+                getFrequencyResponse: this.getFrequencyResponse
             }));
 
         return (
@@ -143,6 +144,11 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
                 break;
         }
         this.setState({ connectors })
+    }
+
+    getFrequencyResponse = (inputFrequencies) => {
+        if (this.props.type !== 'Filter') return;
+        return this.engine.getFrequencyResponse(inputFrequencies);
     }
 
     handleParamChange = (param: string, value: string | number) => {

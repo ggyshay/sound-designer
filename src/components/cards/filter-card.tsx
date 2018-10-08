@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Subscribe } from 'unstated';
-import { Connector } from '../../atoms';
+import { Connector, DisplayComponent } from '../../atoms';
 import { FilterTypes } from '../../atoms/audio-engine';
 import { Knob } from '../../atoms/knob';
 import { SelectionProvider } from '../../providers/selection.provider';
@@ -17,7 +17,8 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
 
         this.state = {
             frequency: 20,
-            Q: 1
+            Q: 1,
+            frequencyResponse: [],
         }
     }
     render() {
@@ -51,8 +52,8 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
                                 <div className="card-header unselectable" onClick={this.props.onCardClick}>
                                     <p>Filter</p>
                                 </div>
-                                <div className="card-display"></div>
-                                <select className="source-selector" onChange={(e) => this.props.onParamChange('type', e.target.value)}>
+                                <div className="card-display"><DisplayComponent data={this.state.frequencyResponse} /></div>
+                                <select className="source-selector" onChange={(e) => this.handleTypeChange(e.target.value)}>
                                     <option value={FilterTypes.LPF}> Low Pass </option>
                                     <option value={FilterTypes.HPF}> High Pass </option>
                                     <option value={FilterTypes.BPF}> Band Pass </option>
@@ -85,13 +86,33 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
         );
     }
 
+    getFrequencyResponse = () => {
+        if (!this.props.getFrequencyResponse) return;
+        let inputFrequencies = new Float32Array(150);
+        for (let i = 0; i < 150; i++) {
+            inputFrequencies[i] = 20000/150 * i;
+        }
+        const frequencyResponse = [];
+        this.props.getFrequencyResponse(inputFrequencies).forEach((y, i) => {
+            frequencyResponse.push({ x: inputFrequencies[i], y })
+        });
+        this.setState({ frequencyResponse });
+    }
+
     handleFrequencyChange = frequency => {
         this.props.onParamChange('frequency', frequency);
         this.setState({ frequency });
+        this.getFrequencyResponse();
     }
 
     handleQChange = Q => {
         this.props.onParamChange('Q', Q);
         this.setState({ Q });
+        this.getFrequencyResponse();
+    }
+
+    handleTypeChange = type => {
+        this.props.onParamChange('type', type);
+        this.getFrequencyResponse();
     }
 }
