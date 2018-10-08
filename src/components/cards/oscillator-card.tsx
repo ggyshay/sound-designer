@@ -59,7 +59,7 @@ export class OscillatorCard extends React.Component<CardComponentProps, any>{
                                 <div className="card-header unselectable" onClick={this.props.onCardClick}>
                                     <p>Oscillator</p>
                                 </div>
-                                <div className="card-display"><DisplayComponent data={Waveforms[this.state.type]} /></div>
+                                <div className="card-display"><DisplayComponent data={Waveforms[this.state.type]} id={this.props.id} /></div>
                                 <select className="source-selector" onChange={this.handleTypeChange}>
                                     <option value={OscillatorTypes.sine}> Sine </option>
                                     <option value={OscillatorTypes.square}> Square </option>

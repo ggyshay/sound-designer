@@ -52,7 +52,7 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
                                 <div className="card-header unselectable" onClick={this.props.onCardClick}>
                                     <p>Filter</p>
                                 </div>
-                                <div className="card-display"><DisplayComponent data={this.state.frequencyResponse} /></div>
+                                <div className="card-display"><DisplayComponent data={this.state.frequencyResponse} id={this.props.id}/></div>
                                 <select className="source-selector" onChange={(e) => this.handleTypeChange(e.target.value)}>
                                     <option value={FilterTypes.LPF}> Low Pass </option>
                                     <option value={FilterTypes.HPF}> High Pass </option>

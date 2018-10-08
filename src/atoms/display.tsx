@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 export interface DisplayComponentProps {
     data: number[];
+    id: string;
 }
 
 export class DisplayComponent extends React.Component<DisplayComponentProps, any> {
@@ -33,7 +34,7 @@ export class DisplayComponent extends React.Component<DisplayComponentProps, any
         const pathData = lineGen(this.props.data);
 
         if (_.isEqual(this.state.pathData, pathData)) return;
-        d3.select('#waveform').attr('d', pathData).attr('fill', 'none').attr('stroke', '#da0027')
+        d3.select(`#waveform${this.props.id}`).attr('d', pathData).attr('fill', 'none').attr('stroke', '#da0027')
         this.setState({ pathData });
     }
 
@@ -41,7 +42,7 @@ export class DisplayComponent extends React.Component<DisplayComponentProps, any
 
     render() {
         return (
-            <svg className="display" style={{ height: '100%', width: '100%' }} ref={this.handleRef} ><path id='waveform'></path></svg >
+            <svg className="display" style={{ height: '100%', width: '100%' }} ref={this.handleRef} ><path id={'waveform' + this.props.id}></path></svg >
         )
     }
 

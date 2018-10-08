@@ -54,7 +54,7 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
                                 <div className="card-header unselectable" onClick={this.props.onCardClick}>
                                     <p>Envelope</p>
                                 </div>
-                                <div className="card-display"><DisplayComponent data={this.state.displayValues} /></div>
+                                <div className="card-display"><DisplayComponent data={this.state.displayValues} id={this.props.id}/></div>
                                 <div className="knob-pannel">
                                     <Knob
                                         style={{ display: "inline-block" }}
