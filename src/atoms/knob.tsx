@@ -33,8 +33,8 @@ export class Knob extends React.Component<KnobProps, KnobState> {
         super(props);
 
         this.state = {
-            value: props.min,
-            angle: 0,
+            value: props.value || props.min,
+            angle: this.getInitialAngle(props.value),
             startY: null,
             startAngle: null,
             startValue: null,
@@ -48,7 +48,7 @@ export class Knob extends React.Component<KnobProps, KnobState> {
     componentWillUnmount() { this.circle.addEventListener('mousedown', this.handleDragStart) }
 
     render() {
-        const value = this.state.value;
+        const value = this.props.value || this.state.value;
         const displayValue = value < 10 ? value.toFixed(3) : (value < 100 ? value.toFixed(2) : (value < 1000 ? value.toFixed(1) : value.toFixed(0)))
         return (
             <div className="knob-container">
@@ -70,12 +70,12 @@ export class Knob extends React.Component<KnobProps, KnobState> {
         e.preventDefault();
         document.addEventListener('mousemove', this.handleDrag);
         document.addEventListener('mouseup', this.handleDragEnd);
-        this.setState({ startY: e.clientY, startAngle: this.state.angle, startValue: this.state.value });
+        this.setState({ startY: e.clientY, startAngle: this.state.angle, startValue: this.props.value || this.state.value });
     }
 
     handleDrag = e => {
         let angle = this.state.angle;
-        let value = this.state.value;
+        let value = this.props.value || this.state.value;
         let deltaY = -e.pageY + this.state.startY;
 
         if (deltaY > 400) deltaY = 400;
@@ -89,8 +89,13 @@ export class Knob extends React.Component<KnobProps, KnobState> {
 
         if (value < this.props.min) value = this.props.min;
         if (value > this.props.max) value = this.props.max;
+
         if (this.props.onChange) this.props.onChange(value);
-        this.setState({ value, angle });
+        if (this.props.value) {
+            this.setState({ angle });
+        } else {
+            this.setState({ value, angle });
+        }
     }
 
 
@@ -114,6 +119,16 @@ export class Knob extends React.Component<KnobProps, KnobState> {
         document.removeEventListener('mousemove', this.handleDrag);
         document.removeEventListener('mouseup', this.handleDragEnd);
         this.setState({ startY: null, startValue: null, startAngle: null })
+    }
+
+    getInitialAngle = (v) => {
+        if (!v) return 0;
+        if (this.props.logarithmic) {
+            const alpha = Math.log(this.props.max / this.props.min);
+            return 300 * Math.log(v / this.props.min) / alpha;
+        } else {
+            return 300 * (v - this.props.min) / (this.props.max - this.props.min)
+        }
     }
 
 }

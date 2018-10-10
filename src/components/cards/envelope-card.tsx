@@ -15,13 +15,15 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
         super(props);
 
         this.state = {
-            attack: null,
-            decay: null,
-            sustain: null,
-            release: null,
+            attack: 0.005,
+            decay: 0.05,
+            sustain: 0.6,
+            release: 0.05,
             displayValues: [],
         }
     }
+
+    componentDidMount() { this.createDisplay() }
 
     render() {
         return (
@@ -54,12 +56,12 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
                                 <div className="card-header unselectable" onClick={this.props.onCardClick} id="card-header">
                                     <p id="card-header-p">Envelope</p>
                                 </div>
-                                <div className="card-display"><DisplayComponent data={this.state.displayValues} id={this.props.id}/></div>
+                                <div className="card-display"><DisplayComponent data={this.state.displayValues} id={this.props.id} /></div>
                                 <div className="knob-pannel">
                                     <Knob
                                         min={1}
                                         max={20000}
-                                        value={this.state.attack}
+                                        value={this.state.attack * 1000}
                                         onChange={v => this.handleParamChange('attack', v)}
                                         label='Attack'
                                         logarithmic
@@ -67,7 +69,7 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
                                     <Knob
                                         min={1}
                                         max={20000}
-                                        value={this.state.sustain}
+                                        value={this.state.decay * 1000}
                                         onChange={v => this.handleParamChange('decay', v)}
                                         label="Decay"
                                         logarithmic
@@ -75,14 +77,14 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
                                     <Knob
                                         min={1}
                                         max={1000}
-                                        value={this.state.decay}
+                                        value={this.state.sustain * 1000}
                                         onChange={v => this.handleParamChange('sustain', v)}
                                         label='Sustain'
                                     />
                                     <Knob
                                         min={1}
                                         max={20000}
-                                        value={this.state.release}
+                                        value={this.state.release * 1000}
                                         onChange={(v) => this.handleParamChange('release', v)}
                                         label="Release"
                                         logarithmic
@@ -102,22 +104,22 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
 
         let displayValues = [];
         displayValues.push({ x: 0, y: 0 });
-        displayValues.push({ x: attack, y: 1000 });
+        displayValues.push({ x: attack, y: 1 });
         displayValues.push({ x: attack + decay, y: sustain });
-        displayValues.push({ x: attack + 3 * decay, y: sustain });
+        displayValues.push({ x: attack + 4 * decay, y: sustain });
 
         const alpha = (-1 / release) * Math.log(0.001 / sustain);
         const step = release / 20;
         for (let i = 1; i < 20; i++) {
             const y = sustain * Math.exp(-alpha * i * step)
-            displayValues.push({ x: i * step + attack + 3 * decay, y });
+            displayValues.push({ x: i * step + attack + 4 * decay, y });
         }
         this.setState({ displayValues });
     }
 
     handleParamChange = (name: string, value: number) => {
         this.props.onParamChange(name, value);
-        this.setState({ [name]: value });
+        this.setState({ [name]: value / 1000 });
         this.createDisplay();
     }
 }

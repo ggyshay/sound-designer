@@ -1,12 +1,8 @@
 import * as React from 'react';
-import { Subscribe } from 'unstated';
-import { CardNodeProvider } from '../../providers/card-node.provider';
-import { ConnectionProvider } from '../../providers/connection.provider';
 import speakerIcon from '../../assets/icons/speaker-icon.svg';
+import { Connector } from '../../atoms';
 import './cards.css';
 import { CardComponentProps } from './oscillator-card';
-import './cards.css';
-import { Connector } from '../../atoms';
 
 export class OutputCard extends React.Component<CardComponentProps>{
 
@@ -31,8 +27,8 @@ export class OutputCard extends React.Component<CardComponentProps>{
                         />
                     )
                 })}
-                <div className="output-card unselectable" onMouseDown={this.props.handleCardDrag}>
-                    <img src={speakerIcon} className="ignore-mouse" />
+                <div className="output-card unselectable" onMouseDown={this.props.handleCardDrag} id="card-body">
+                    <img src={speakerIcon} className="ignore-mouse" id="card-header" />
                 </div>
             </div>
         );
