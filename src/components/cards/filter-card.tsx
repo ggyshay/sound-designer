@@ -28,7 +28,7 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
                     this.selectionProvider = sp;
                     const classname = 'card' + (this.selectionProvider.isSelected(this.props.id) ? ' selected' : '')
                     return (
-                        <div>
+                        <div id="card-body">
                             {this.props.connectors.map(cn => {
                                 return (
                                     <Connector
@@ -48,9 +48,9 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
                                 )
                             })}
                             <div className={classname} onMouseDown={this.props.handleCardDrag}
-                                style={{ width: this.width, height: this.height }}>
-                                <div className="card-header unselectable" onClick={this.props.onCardClick}>
-                                    <p>Filter</p>
+                                style={{ width: this.width, height: this.height }} id="card-body">
+                                <div className="card-header unselectable" onClick={this.props.onCardClick} id="card-header">
+                                    <p id="card-header-p">Filter</p>
                                 </div>
                                 <div className="card-display"><DisplayComponent data={this.state.frequencyResponse} id={this.props.id}/></div>
                                 <select className="source-selector" onChange={(e) => this.handleTypeChange(e.target.value)}>
@@ -60,22 +60,19 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
                                 </select>
                                 <div className="knob-pannel">
                                     <Knob
-                                        style={{ display: "inline-block" }}
                                         min={20}
                                         max={20000}
-                                        unlockDistance={0}
                                         value={this.state.frequency}
                                         onChange={this.handleFrequencyChange}
-                                        label='Frequency'
+                                        label={filterParams.frequency}
+                                        logarithmic
                                     />
                                     <Knob
-                                        style={{ display: "inline-block" }}
                                         min={0}
                                         max={5}
-                                        unlockDistance={0}
                                         value={this.state.Q}
                                         onChange={this.handleQChange}
-                                        label="Q"
+                                        label={filterParams.Q}
                                     />
                                 </div>
                             </div>
@@ -100,19 +97,27 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
     }
 
     handleFrequencyChange = frequency => {
-        this.props.onParamChange('frequency', frequency);
+        this.props.onParamChange(filterParams.frequency, frequency);
         this.setState({ frequency });
         this.getFrequencyResponse();
     }
 
     handleQChange = Q => {
-        this.props.onParamChange('Q', Q);
+        this.props.onParamChange(filterParams.Q, Q);
         this.setState({ Q });
         this.getFrequencyResponse();
     }
 
     handleTypeChange = type => {
-        this.props.onParamChange('type', type);
+        this.props.onParamChange(filterParams.type, type);
         this.getFrequencyResponse();
     }
+}
+
+export enum filterParams {
+    input = 'InSignal',
+    output = 'OutSignal',
+    frequency = 'frequency',
+    Q = 'Q',
+    type = 'type',
 }

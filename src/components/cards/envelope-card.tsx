@@ -50,47 +50,42 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
                                 )
                             })}
                             <div className={classname} onMouseDown={this.props.handleCardDrag}
-                                style={{ width: this.width, height: this.height }}>
-                                <div className="card-header unselectable" onClick={this.props.onCardClick}>
-                                    <p>Envelope</p>
+                                style={{ width: this.width, height: this.height }} id="card-body">
+                                <div className="card-header unselectable" onClick={this.props.onCardClick} id="card-header">
+                                    <p id="card-header-p">Envelope</p>
                                 </div>
                                 <div className="card-display"><DisplayComponent data={this.state.displayValues} id={this.props.id}/></div>
                                 <div className="knob-pannel">
                                     <Knob
-                                        style={{ display: "inline-block" }}
                                         min={1}
                                         max={20000}
-                                        unlockDistance={0}
                                         value={this.state.attack}
                                         onChange={v => this.handleParamChange('attack', v)}
                                         label='Attack'
+                                        logarithmic
                                     />
                                     <Knob
-                                        style={{ display: "inline-block" }}
                                         min={1}
                                         max={20000}
-                                        unlockDistance={0}
                                         value={this.state.sustain}
                                         onChange={v => this.handleParamChange('decay', v)}
                                         label="Decay"
+                                        logarithmic
                                     />
                                     <Knob
-                                        style={{ display: "inline-block" }}
                                         min={1}
                                         max={1000}
-                                        unlockDistance={0}
                                         value={this.state.decay}
                                         onChange={v => this.handleParamChange('sustain', v)}
                                         label='Sustain'
                                     />
                                     <Knob
-                                        style={{ display: "inline-block" }}
                                         min={1}
                                         max={20000}
-                                        unlockDistance={0}
                                         value={this.state.release}
                                         onChange={(v) => this.handleParamChange('release', v)}
                                         label="Release"
+                                        logarithmic
                                     />
                                 </div>
                             </div>
@@ -125,4 +120,9 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
         this.setState({ [name]: value });
         this.createDisplay();
     }
+}
+
+export enum envelopeParams {
+    input = 'InSignal',
+    output = 'OutSignal'
 }

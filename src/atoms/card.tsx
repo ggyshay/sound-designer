@@ -102,6 +102,8 @@ export class Card extends React.Component<CardProps, CardState> {
     }
 
     handleCardDrag = e => {
+        const id = e.target.id;
+        if(!(id === 'card-header' || id === 'card-header-p' || id === 'card-body')) return;
         this.props.handleCardDrag(e, this.props.id);
     }
 

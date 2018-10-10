@@ -6,6 +6,7 @@ import { CardNodeProvider } from '../providers/card-node.provider';
 import { ComponentMenu } from './component-menu';
 import { EngineComponent } from './engine-component';
 import { ConnectionProvider } from '../providers/connection.provider';
+import { Knob } from '../atoms';
 
 export interface CanvasProps {
     onConnectorDrag: (metadata: any) => void;

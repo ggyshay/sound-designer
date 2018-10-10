@@ -2,11 +2,14 @@ import _ from 'lodash';
 import * as React from 'react';
 import { Subscribe } from 'unstated';
 import { ConnectionMeta, ConnectorMeta } from '../atoms';
-import { AudioEngine } from '../atoms/audio-engine';
+import { AudioEngine, EngineTypeStrings } from '../atoms/audio-engine';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { ConnectionProvider } from '../providers/connection.provider';
 import { CardNode } from './canvas';
 import { SelectionProvider } from '../providers/selection.provider';
+import { OutputCardParams } from './cards/output-card';
+import { filterParams, envelopeParams } from './cards';
+import { OscillatorParams } from './cards/oscillator-card';
 
 
 export interface EngineComponentProps {
@@ -130,24 +133,24 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     createConnectors = () => {
         let connectors = null
         switch (this.props.type) {
-            case 'Output':
-                connectors = { inputs: ['InSignal'], outputs: [] };
+            case EngineTypeStrings.output:
+                connectors = { inputs: [OutputCardParams.input], outputs: [] };
                 break;
-            case 'Filter':
-                connectors = { inputs: ['InSignal', 'cutoff', 'resonance'], outputs: ['OutSignal'] }
+            case EngineTypeStrings.filter:
+                connectors = { inputs: [filterParams.input, filterParams.frequency, filterParams.Q], outputs: [filterParams.output] }
                 break;
-            case 'Envelope':
-                connectors = { inputs: ['InSignal'], outputs: ['OutSignal'] }
+            case EngineTypeStrings.envelope:
+                connectors = { inputs: [envelopeParams.input], outputs: [envelopeParams.output] }
                 break;
             default:
-                connectors = { inputs: ['frequency'], outputs: ['OutSignal'] }
+                connectors = { inputs: [OscillatorParams.frequency], outputs: [OscillatorParams.output] }
                 break;
         }
         this.setState({ connectors })
     }
 
     getFrequencyResponse = (inputFrequencies) => {
-        if (this.props.type !== 'Filter') return;
+        if (this.props.type !== EngineTypeStrings.filter) return;
         return this.engine.getFrequencyResponse(inputFrequencies);
     }
 

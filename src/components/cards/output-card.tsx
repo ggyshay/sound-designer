@@ -38,3 +38,7 @@ export class OutputCard extends React.Component<CardComponentProps>{
         );
     }
 }
+
+export enum OutputCardParams {
+    input = 'InSignal'
+}

@@ -55,9 +55,9 @@ export class OscillatorCard extends React.Component<CardComponentProps, any>{
                                     />
                                 )
                             })}
-                            <div className={classname} onMouseDown={this.props.handleCardDrag}>
-                                <div className="card-header unselectable" onClick={this.props.onCardClick}>
-                                    <p>Oscillator</p>
+                            <div className={classname} onMouseDown={this.props.handleCardDrag} id="card-body">
+                                <div className="card-header unselectable" onClick={this.props.onCardClick} id="card-header">
+                                    <p id="card-header-p">Oscillator</p>
                                 </div>
                                 <div className="card-display"><DisplayComponent data={Waveforms[this.state.type]} id={this.props.id} /></div>
                                 <select className="source-selector" onChange={this.handleTypeChange}>
@@ -78,4 +78,9 @@ export class OscillatorCard extends React.Component<CardComponentProps, any>{
         this.setState({ type: e.target.value });
         this.props.onParamChange('type', e.target.value)
     }
+}
+
+export enum OscillatorParams {
+    frequency = 'frequency',
+    output = 'OutSignal',
 }

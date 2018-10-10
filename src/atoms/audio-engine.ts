@@ -1,4 +1,3 @@
-import { EnvelopeNode } from "../engines/envelope";
 
 export type EngineType = OscillatorNode | BiquadFilterNode | GainNode | AudioDestinationNode
 
@@ -59,18 +58,18 @@ export class AudioEngine {
         this.stop();
         this.playing = false;
         switch (this.type) {
-            case 'Oscillator':
+            case EngineTypeStrings.oscillator:
                 this.engine = new OscillatorNode(this.ctx);
                 this.engine.type = this.oscParams.type;
                 this.engine.frequency.value = this.oscParams.frequency;
                 break;
-            case 'Filter':
+            case EngineTypeStrings.filter:
                 this.engine = new BiquadFilterNode(this.ctx);
                 break;
-            case 'Envelope':
+            case EngineTypeStrings.envelope:
                 this.engine = new GainNode(this.ctx);
                 break;
-            case 'Output':
+            case EngineTypeStrings.output:
                 this.engine = this.ctx.destination;
                 break;
         }
@@ -78,11 +77,11 @@ export class AudioEngine {
     connect(inEngine: AudioEngine, outParameter: string, inParameter: string) {
         // this is breaking because inEngine is sometimes an audio param:
         // overide fn to accept audioParam as parameter
-        if (outParameter === 'OutSignal' && inParameter === "InSignal") {
+        if (outParameter === SignalTypes.outSignal && inParameter === SignalTypes.inSignal) {
             this.engine.connect(inEngine.engine);
-        } else if (outParameter === 'OutSignal') {
+        } else if (outParameter === SignalTypes.outSignal) {
             this.engine.connect(inEngine.engine[inParameter]);
-        } else if (inParameter === 'InSignal') {
+        } else if (inParameter === SignalTypes.inSignal) {
             this.engine[outParameter].connect(inEngine.engine);
         } else {
             this.engine[outParameter].connect(inEngine.engine[inParameter]);
@@ -95,11 +94,11 @@ export class AudioEngine {
             return;
         }
 
-        if (outParameter === 'OutSignal' && inParameter === "InSignal") {
+        if (outParameter === SignalTypes.outSignal && inParameter === SignalTypes.inSignal) {
             this.engine.disconnect(inEngine.engine);
-        } else if (outParameter === 'OutSignal') {
+        } else if (outParameter === SignalTypes.outSignal) {
             this.engine.disconnect(inEngine.engine[inParameter]);
-        } else if (inParameter === 'InSignal') {
+        } else if (inParameter === SignalTypes.inSignal) {
             this.engine[outParameter].disconnect(inEngine.engine);
         } else {
             this.engine[outParameter].disconnect(inEngine.engine[inParameter]);
@@ -112,7 +111,7 @@ export class AudioEngine {
 
     changeParam = (param: string, value: string | number) => {
         if (!this.engine) { return }
-        if (this.type === 'Envelope' && typeof value === 'number') {
+        if (this.type === EngineTypeStrings.envelope && typeof value === 'number') {
             this.envParams[param] = value / 1000;
         } else if (this.engine[param]) {
             if (typeof value === 'string') {
@@ -144,4 +143,16 @@ export enum OscillatorTypes {
     saw = 'sawtooth',
     triangle = 'triangle',
     square = 'square'
+}
+
+export enum EngineTypeStrings {
+    oscillator = 'Oscillator',
+    filter = 'Filter',
+    envelope = 'Envelope',
+    output = 'Output',
+}
+
+export enum SignalTypes {
+    inSignal = 'InSignal',
+    outSignal = 'OutSignal',
 }
