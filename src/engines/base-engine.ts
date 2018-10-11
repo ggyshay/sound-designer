@@ -1,14 +1,12 @@
 export class BaseEngine {
-    public input: GainNode | OscillatorNode | BiquadFilterNode;
+    public input: GainNode | OscillatorNode | BiquadFilterNode | ConstantSourceNode;
 
     start = (time?: number) => this.input instanceof OscillatorNode && this.input.start(time)
     stop = () => this.input instanceof OscillatorNode && this.input.stop()
 
-    connect(destinationNode: AudioNode, output?: number, input?: number): AudioNode;
-    connect(destinationParam: AudioParam, output?: number): void;
-    connect(destination: any, output?: number, input?: number): any {
-        console.log(destination);
-        
+    public connect(destinationNode: AudioNode, output?: number, input?: number): AudioNode;
+    public connect(destinationParam: AudioParam, output?: number): void;
+    public connect(destination: any, output?: number, input?: number): any {
         this.input.connect(destination, output, input);
     }
 
@@ -23,8 +21,4 @@ export class BaseEngine {
     disconnect(destination?: any, output?: any, input?: any) {
         this.input.disconnect(destination, output, input);
     }
-
-    // changeParam = (param: string, value: string|number):void => {
-    //     throw new Error('changeParam not implemented by sub class');
-    // }
 }

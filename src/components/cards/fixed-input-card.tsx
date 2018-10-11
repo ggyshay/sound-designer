@@ -1,10 +1,8 @@
 import * as React from 'react';
 import { Subscribe } from 'unstated';
-import { Connector, ConnectorMeta, DisplayComponent } from '../../atoms';
-import { OscillatorTypes } from '../../atoms/audio-engine';
+import { Connector, ConnectorMeta } from '../../atoms';
 import { SelectionProvider } from '../../providers/selection.provider';
 import './cards.css';
-import { Waveforms } from '../../atoms/waveforms';
 
 export interface CardComponentProps {
     onParamChange: (param: string, value: string | number) => void;
@@ -20,7 +18,7 @@ export interface CardComponentProps {
     getFrequencyResponse?: (inputFrequencies: Float32Array) => Float32Array;
 }
 
-export class OscillatorCard extends React.Component<CardComponentProps, any>{
+export class FixedInputCard extends React.Component<CardComponentProps, any>{
     private selectionProvider: SelectionProvider = null;
     constructor(props) {
         super(props);
@@ -34,7 +32,7 @@ export class OscillatorCard extends React.Component<CardComponentProps, any>{
             <Subscribe to={[SelectionProvider]} >
                 {(selectionProvider: SelectionProvider) => {
                     this.selectionProvider = selectionProvider;
-                    const classname = 'card' + (this.selectionProvider.isSelected(this.props.id) ? ' selected' : '')
+                    const classname = 'field-card' + (this.selectionProvider.isSelected(this.props.id) ? ' selected' : '')
                     return (
                         <div>
                             {this.props.connectors.map(cn => {
@@ -56,16 +54,7 @@ export class OscillatorCard extends React.Component<CardComponentProps, any>{
                                 )
                             })}
                             <div className={classname} onMouseDown={this.props.handleCardDrag} id="card-body">
-                                <div className="card-header unselectable" onClick={this.props.onCardClick} id="card-header">
-                                    <p id="card-header-p">Oscillator</p>
-                                </div>
-                                <div className="card-display"><DisplayComponent data={Waveforms[this.state.type]} id={this.props.id} /></div>
-                                <select className="source-selector" onChange={this.handleTypeChange}>
-                                    <option value={OscillatorTypes.sine}> Sine </option>
-                                    <option value={OscillatorTypes.square}> Square </option>
-                                    <option value={OscillatorTypes.saw}> Saw </option>
-                                    <option value={OscillatorTypes.triangle}> Triangle </option>
-                                </select>
+                                <input className="frequency-input" onChange={this.handleValueChange}/>
                             </div>
                         </div>);
                 }}
@@ -73,13 +62,8 @@ export class OscillatorCard extends React.Component<CardComponentProps, any>{
         )
     }
 
-    handleTypeChange = e => {
-        this.setState({ type: e.target.value });
-        this.props.onParamChange('type', e.target.value)
+    handleValueChange = e => {
+        this.setState({ value: e.target.value });
+        this.props.onParamChange('offset', e.target.value)
     }
-}
-
-export enum OscillatorParams {
-    frequency = 'frequency',
-    output = 'OutSignal',
 }

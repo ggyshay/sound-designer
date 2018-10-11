@@ -10,6 +10,7 @@ import { SelectionProvider } from '../providers/selection.provider';
 import { OutputCardParams } from './cards/output-card';
 import { filterParams, envelopeParams } from './cards';
 import { OscillatorParams } from './cards/oscillator-card';
+import { InputCardParams } from './cards/input-card';
 
 
 export interface EngineComponentProps {
@@ -57,6 +58,8 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
                     this.cardNodeProvider = cnc;
                     this.connectionProvider = cp;
                     this.selectionProvider = sp;
+
+                    this.engine.setNodeProviderRef(cnc);
 
                     return <div>{childrenWithProps}</div>
                 }}
@@ -141,6 +144,9 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
                 break;
             case EngineTypeStrings.envelope:
                 connectors = { inputs: [envelopeParams.input], outputs: [envelopeParams.output] }
+                break;
+            case EngineTypeStrings.input:
+                connectors = { inputs: [], outputs: [InputCardParams.output]}
                 break;
             default:
                 connectors = { inputs: [OscillatorParams.frequency], outputs: [OscillatorParams.output] }

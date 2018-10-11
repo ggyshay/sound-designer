@@ -5,6 +5,27 @@
     background-color: #3F3F3F;
 }
 
+.field-card {
+    width: 9rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background-color: #3F3F3F;
+}
+
+.field-card input {
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    height: 100%;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.field-card p:focus{
+    outline: none;
+}
+
 .card-header {
     background-color: #e9e9e9;
     padding: 0.4rem;

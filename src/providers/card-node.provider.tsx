@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import * as React from 'react';
 import { Container } from 'unstated';
 import { CardNode } from '../components';
-import { EngineComponent } from '../components/engine-component';
+import * as React from 'react';
+import { EngineComponent } from 'src/components/engine-component';
 
 interface CardNodeProviderState {
     nodes: CardNode[];
@@ -11,7 +11,10 @@ interface CardNodeProviderState {
 export class CardNodeProvider extends Container<CardNodeProviderState> {
     constructor() {
         super();
-        this.state = { nodes: [{ x: 500, y: 300, id: 'Output', type: 'Output', connectors: [], engine: null, engRef: React.createRef<EngineComponent>() },] };
+        this.state = {
+            nodes: [{ x: 500, y: 300, id: 'Output', type: 'Output', connectors: [], engine: null, engRef: React.createRef<EngineComponent>()  },
+            { x: 100, y: 300, id: 'Input', type: 'Input', connectors: [], engine: null, engRef: React.createRef<EngineComponent>()  },]
+        };
     }
 
     removeNodeWithId = (id: string) => {

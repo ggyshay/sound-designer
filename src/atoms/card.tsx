@@ -7,6 +7,10 @@ import { SelectionProvider } from '../providers/selection.provider';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { Subscribe } from 'unstated';
 import _ from 'lodash';
+import { InputCard } from 'src/components/cards/input-card';
+import { EngineTypeStrings } from './audio-engine';
+import { FixedInput } from 'src/engines/fixed-input';
+import { FixedInputCard } from 'src/components/cards/fixed-input-card';
 
 export interface CardProps {
     Position: { x: number, y: number }
@@ -76,10 +80,11 @@ export class Card extends React.Component<CardProps, CardState> {
 
     setupConnectors = () => {
         switch (this.props.type) {
-            case 'Filter': this.width = 205; this.height = 285; break;
-            case 'Envelope':  this.width = 300; this.height = 225; break;
-            case 'Output':  this.width = 80; this.height = 80; break;
-            default:  this.width = 192; this.height = 250; break;
+            case EngineTypeStrings.filter: this.width = 205; this.height = 285; break;
+            case EngineTypeStrings.envelope: this.width = 300; this.height = 225; break;
+            case EngineTypeStrings.output: this.width = 80; this.height = 80; break;
+            case EngineTypeStrings.input: this.width = 80; this.height = 80; break;
+            case EngineTypeStrings.oscillator: this.width = 192; this.height = 250; break;
         }
         const { Position: { x, y }, id, connectors: { inputs, outputs } } = this.props
         const connectors = []
@@ -103,7 +108,7 @@ export class Card extends React.Component<CardProps, CardState> {
 
     handleCardDrag = e => {
         const id = e.target.id;
-        if(!(id === 'card-header' || id === 'card-header-p' || id === 'card-body')) return;
+        if (!(id === 'card-header' || id === 'card-header-p' || id === 'card-body')) return;
         this.props.handleCardDrag(e, this.props.id);
     }
 
@@ -122,10 +127,12 @@ export class Card extends React.Component<CardProps, CardState> {
         }
 
         switch (this.props.type) {
-            case 'Filter': return <FilterCard {...props} />
-            case 'Envelope': return <EnvelopeCard {...props} />
-            case 'Output': return <OutputCard {...props} />
-            default: return <OscillatorCard {...props} />
+            case EngineTypeStrings.filter: return <FilterCard {...props} />
+            case EngineTypeStrings.envelope: return <EnvelopeCard {...props} />
+            case EngineTypeStrings.output: return <OutputCard {...props} />
+            case EngineTypeStrings.input: return <InputCard {...props} />
+            case EngineTypeStrings.oscillator: return <OscillatorCard {...props} />
+            case EngineTypeStrings.fixedInput: return <FixedInputCard {...props}/>
         }
     }
 

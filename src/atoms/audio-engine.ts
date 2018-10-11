@@ -1,6 +1,6 @@
-import { Filter, Oscillator, Envelope } from "src/engines";
+import { Filter, Oscillator, Envelope, Input } from "src/engines";
 
-export type EngineType = Oscillator | Filter | Envelope | AudioDestinationNode;
+export type EngineType = Oscillator | Filter | Envelope | AudioDestinationNode | Input;
 
 export class AudioEngine {
     private type: string;
@@ -16,6 +16,7 @@ export class AudioEngine {
         if (type === EngineTypeStrings.oscillator) { this.engine = new Oscillator(this.ctx) }
         else if (type === EngineTypeStrings.filter) { this.engine = new Filter(this.ctx) }
         else if (type === EngineTypeStrings.envelope) { this.engine = new Envelope(this.ctx) }
+        else if (type === EngineTypeStrings.input) { this.engine = new Input(this.ctx) }
     }
 
     start = (time?: number) => {
@@ -48,10 +49,15 @@ export class AudioEngine {
         }
     }
     connect(inEngine: AudioEngine, outParameter: string, inParameter: string) {
+        if (inEngine.engine instanceof Oscillator && this.type === EngineTypeStrings.input) {
+            this.engine.connect(inEngine.engine.proxy);
+            return;
+        }
+
         if (outParameter === SignalTypes.outSignal && inParameter === SignalTypes.inSignal) {
             if (inEngine.engine instanceof Oscillator || inEngine.engine instanceof Filter || inEngine.engine instanceof Envelope) {
                 this.engine.connect(inEngine.engine.input);
-            } else {
+            } else if (inEngine.engine instanceof AudioDestinationNode) {
                 this.engine.connect(inEngine.engine);
             }
         } else if (outParameter === SignalTypes.outSignal) {
@@ -73,7 +79,7 @@ export class AudioEngine {
 
             if (inEngine.engine instanceof Oscillator || inEngine.engine instanceof Filter || inEngine.engine instanceof Envelope) {
                 this.engine.disconnect(inEngine.engine.input)
-            } else {
+            } else if (inEngine.engine instanceof AudioDestinationNode) {
                 this.engine.disconnect(inEngine.engine);
             }
 
@@ -93,7 +99,7 @@ export class AudioEngine {
     changeParam = (param: string, value: string | number) => {
         if (!this.engine) { return }
         if (this.engine instanceof Envelope && typeof value === 'number') {
-            this.engine.changeParam(param, value/1000);
+            this.engine.changeParam(param, value / 1000);
         } else if (this.engine instanceof Oscillator || this.engine instanceof Filter) {
             this.engine.changeParam(param, value)
         }
@@ -105,6 +111,12 @@ export class AudioEngine {
         const phaseResponse = new Float32Array(inputFrequencies.length);
         this.engine.input.getFrequencyResponse(inputFrequencies, magResponse, phaseResponse);
         return magResponse.filter(v => !isNaN(v));
+    }
+
+    setNodeProviderRef = nc => {
+        if (this.engine instanceof Input) {
+            this.engine.setNodeProviderRef(nc);
+        }
     }
 }
 
@@ -125,6 +137,8 @@ export enum EngineTypeStrings {
     filter = 'Filter',
     envelope = 'Envelope',
     output = 'Output',
+    input = 'Input',
+    fixedInput = 'Fixed-Input'
 }
 
 export enum SignalTypes {
