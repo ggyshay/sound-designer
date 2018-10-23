@@ -4,6 +4,9 @@ import sineIC from '../assets/icons/sine-icon.svg';
 import envIC from '../assets/icons/env-icon.svg';
 import fltIC from '../assets/icons/flt-icon.svg';
 import plusIC from '../assets/icons/plus-icon.svg';
+import frequencyIC from '../assets/icons/frequency-icon.svg';
+import pianoIC from '../assets/icons/piano-icon.svg';
+import LFOIC from './../assets/icons/LFO-icon.svg';
 import { EngineTypeStrings } from 'src/atoms';
 
 export class ComponentMenu extends React.Component<any, any>{
@@ -17,7 +20,7 @@ export class ComponentMenu extends React.Component<any, any>{
         return (
             <div className="menu">
                 <div className="menu-button" onMouseEnter={this.handleOpenMenu}>
-                    <img src={plusIC} className="plusIC" />
+                    <img src={plusIC} className="plusIC unselectable"/>
                 </div>
                 <div className={"menu-container " + (this.state.active ? "menu-container-expanded" : "")} onMouseLeave={this.handleCloseMenu}>
                     <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, EngineTypeStrings.oscillator)}>
@@ -30,10 +33,13 @@ export class ComponentMenu extends React.Component<any, any>{
                         <img src={fltIC} className="nodeIC unselectable" />
                     </div>
                     <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, EngineTypeStrings.input)}>
-                        <img src={fltIC} className="nodeIC unselectable" />
+                        <img src={pianoIC} className="nodeIC unselectable" />
                     </div>
                     <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, EngineTypeStrings.fixedInput)}>
-                        <img src={fltIC} className="nodeIC unselectable" />
+                        <img src={frequencyIC} className="nodeIC unselectable" />
+                    </div>
+                    <div className="menu-button" draggable onDragStart={e => this.props.handleDrag(e, EngineTypeStrings.LFO)}>
+                        <img src={LFOIC} className="nodeIC unselectable" />
                     </div>
                 </div>
             </div>

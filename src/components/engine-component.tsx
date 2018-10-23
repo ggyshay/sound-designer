@@ -40,7 +40,10 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     }
     componentWillMount() { this.createConnectors(); }
     componentDidUpdate() { if (this.props.connect) this.checkConnect(); }
-    componentDidMount() { this.updateProviderData(); }
+    componentDidMount() {
+        this.updateProviderData();
+        this.engine.setNodeProviderRef(this.cardNodeProvider);
+    }
 
     render() {
         const { children } = this.props;
@@ -58,8 +61,6 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
                     this.cardNodeProvider = cnc;
                     this.connectionProvider = cp;
                     this.selectionProvider = sp;
-
-                    this.engine.setNodeProviderRef(cnc);
 
                     return <div>{childrenWithProps}</div>
                 }}
@@ -146,11 +147,18 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
                 connectors = { inputs: [envelopeParams.input], outputs: [envelopeParams.output] }
                 break;
             case EngineTypeStrings.input:
-                connectors = { inputs: [], outputs: [InputCardParams.output]}
+                connectors = { inputs: [], outputs: [InputCardParams.output] }
                 break;
-            default:
+            case EngineTypeStrings.oscillator:
                 connectors = { inputs: [OscillatorParams.frequency], outputs: [OscillatorParams.output] }
                 break;
+            case EngineTypeStrings.fixedInput:
+                connectors = { inputs: [], outputs: [InputCardParams.output] }
+                break;
+            case EngineTypeStrings.LFO:
+                connectors = { inputs: [OscillatorParams.frequency], outputs: [OscillatorParams.output] };
+                break;
+            default: throw new Error('invalid engine type string for engine component connectors creation');
         }
         this.setState({ connectors })
     }

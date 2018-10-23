@@ -1,5 +1,5 @@
 import * as React from 'react';
-import speakerIcon from '../../assets/icons/speaker-icon.svg';
+import pianoIC from '../../assets/icons/piano-icon.svg';
 import { Connector } from '../../atoms';
 import './cards.css';
 import { CardComponentProps } from './oscillator-card';
@@ -28,7 +28,7 @@ export class InputCard extends React.Component<CardComponentProps>{
                     )
                 })}
                 <div className="output-card unselectable" onMouseDown={this.props.handleCardDrag} id="card-body">
-                    <img src={speakerIcon} className="ignore-mouse" id="card-header" />
+                    <img src={pianoIC} className="ignore-mouse" id="card-header" />
                 </div>
             </div>
         );

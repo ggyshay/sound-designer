@@ -7,7 +7,7 @@ import './cards.css';
 import { Waveforms } from '../../atoms/waveforms';
 
 export interface CardComponentProps {
-    onParamChange: (param: string, value: string | number) => void;
+    onParamChange: (param: string, value: string | number | Float32Array) => void;
     handleCardDrag: (e: any) => void;
     connectors?: ConnectorMeta[];
     Position: { x: number, y: number };
@@ -18,6 +18,8 @@ export interface CardComponentProps {
     connect?: { Outp: ConnectorMeta, Inp: ConnectorMeta };
     onCardClick: (e: any) => void;
     getFrequencyResponse?: (inputFrequencies: Float32Array) => Float32Array;
+    width: number;
+    height: number;
 }
 
 export class OscillatorCard extends React.Component<CardComponentProps, any>{

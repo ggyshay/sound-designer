@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Subscribe } from 'unstated';
 import { Card, ConnectorMeta } from '../atoms';
 import { AudioEngine } from '../atoms/audio-engine';
+import { InputDisplayComponent } from '../atoms/input-display';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { ConnectionProvider } from '../providers/connection.provider';
 import { ComponentMenu } from './component-menu';

@@ -19,8 +19,9 @@
 .nodeIC {
     width: 2rem;
     position: relative;
-    top: 1rem;
+    top: 0.7rem;
     left: 0.5rem;
+    height: 1.8rem;
 }
 
 .plusIC {
@@ -38,6 +39,6 @@
 }
 
 .menu-container-expanded{
-    height: 20rem;
+    height: 25rem;
     transition: height ease-in-out 0.3s;
 }

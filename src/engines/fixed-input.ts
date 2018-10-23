@@ -5,7 +5,6 @@ export class FixedInput extends BaseEngine {
     public input: ConstantSourceNode;
     private ctx: AudioContext;
     private params: { offset: number }
-    private pressing: boolean;
     private nodeProvider: CardNodeProvider;
 
     constructor(ctx) {
@@ -13,7 +12,6 @@ export class FixedInput extends BaseEngine {
         this.ctx = ctx;
         this.params = { offset: 440 }
         this.setup();
-        this.pressing = false;
     }
 
     setup = () => {
@@ -22,7 +20,7 @@ export class FixedInput extends BaseEngine {
         this.input.start();
     }
 
-    changeParam = (param: string, value: number) => {
+    changeParam = (param: string, value: number|string):void => {
         if (param !== 'offset') return;
         this.changeOffset(value);
     }
@@ -30,7 +28,6 @@ export class FixedInput extends BaseEngine {
     changeOffset = off => {
         this.input.offset.value = off;
         this.params.offset = off;
-        this.pressing = true;
         this.nodeProvider.renewConnections();
     }
 

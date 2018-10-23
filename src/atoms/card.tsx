@@ -11,6 +11,7 @@ import { InputCard } from 'src/components/cards/input-card';
 import { EngineTypeStrings } from './audio-engine';
 import { FixedInput } from 'src/engines/fixed-input';
 import { FixedInputCard } from 'src/components/cards/fixed-input-card';
+import { LFOCard } from 'src/components/cards/lfo-card';
 
 export interface CardProps {
     Position: { x: number, y: number }
@@ -85,6 +86,9 @@ export class Card extends React.Component<CardProps, CardState> {
             case EngineTypeStrings.output: this.width = 80; this.height = 80; break;
             case EngineTypeStrings.input: this.width = 80; this.height = 80; break;
             case EngineTypeStrings.oscillator: this.width = 192; this.height = 250; break;
+            case EngineTypeStrings.fixedInput: this.width = 143; this.height = 80; break;
+            case EngineTypeStrings.LFO: this.width = 300; this.height = 200; break;
+            default: throw new Error('invalid engine type string for card creation');
         }
         const { Position: { x, y }, id, connectors: { inputs, outputs } } = this.props
         const connectors = []
@@ -100,6 +104,7 @@ export class Card extends React.Component<CardProps, CardState> {
                 id: id + outp, parentX: x, parentY: y, parentId: id, connections: [], type: outp
             })
         })
+
         const node = this.cardNodeProvider.getNodeWithId(this.props.id);
         node.connectors = connectors;
         this.cardNodeProvider.updateNode(node, this.props.id);
@@ -124,6 +129,8 @@ export class Card extends React.Component<CardProps, CardState> {
             onConnectorDrag: this.props.onConnectorDrag,
             onConnectorLost: this.props.onConnectorLost,
             getFrequencyResponse: this.props.getFrequencyResponse,
+            width: this.width,
+            height: this.height,
         }
 
         switch (this.props.type) {
@@ -132,7 +139,9 @@ export class Card extends React.Component<CardProps, CardState> {
             case EngineTypeStrings.output: return <OutputCard {...props} />
             case EngineTypeStrings.input: return <InputCard {...props} />
             case EngineTypeStrings.oscillator: return <OscillatorCard {...props} />
-            case EngineTypeStrings.fixedInput: return <FixedInputCard {...props}/>
+            case EngineTypeStrings.fixedInput: return <FixedInputCard {...props} />
+            case EngineTypeStrings.LFO: return <LFOCard {...props} />
+            default: throw new Error('invalid engine type string for card creation');
         }
     }
 

@@ -23,7 +23,7 @@ export class FixedInputCard extends React.Component<CardComponentProps, any>{
     constructor(props) {
         super(props);
         this.state = {
-            type: 'sine',
+            value: 440,
         }
     }
 
@@ -54,7 +54,7 @@ export class FixedInputCard extends React.Component<CardComponentProps, any>{
                                 )
                             })}
                             <div className={classname} onMouseDown={this.props.handleCardDrag} id="card-body">
-                                <input className="frequency-input" onChange={this.handleValueChange}/>
+                                <input className="frequency-input" onChange={this.handleValueChange} value={this.state.value + ' Hz'} />
                             </div>
                         </div>);
                 }}
@@ -63,7 +63,8 @@ export class FixedInputCard extends React.Component<CardComponentProps, any>{
     }
 
     handleValueChange = e => {
-        this.setState({ value: e.target.value });
-        this.props.onParamChange('offset', e.target.value)
+        const value = e.target.value.replace(/[^(0-9.)]/gm, '');
+        this.props.onParamChange('offset', value)
+        this.setState({ value });
     }
 }
