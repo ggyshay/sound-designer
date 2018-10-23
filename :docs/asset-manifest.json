@@ -1,0 +1,16 @@
+{
+  "main.css": "static/css/main.fde5c45a.css",
+  "main.css.map": "static/css/main.fde5c45a.css.map",
+  "main.js": "static/js/main.b98e8ea6.js",
+  "main.js.map": "static/js/main.b98e8ea6.js.map",
+  "static/media/LFO-icon.svg": "static/media/LFO-icon.d64f7928.svg",
+  "static/media/env-icon.svg": "static/media/env-icon.fa11ca9d.svg",
+  "static/media/flt-icon.svg": "static/media/flt-icon.981fd007.svg",
+  "static/media/frequency-icon.svg": "static/media/frequency-icon.592435d8.svg",
+  "static/media/loop-icon.svg": "static/media/loop-icon.b99bc1ee.svg",
+  "static/media/oneshot-icon.svg": "static/media/oneshot-icon.c7beb464.svg",
+  "static/media/piano-icon.svg": "static/media/piano-icon.46226e8c.svg",
+  "static/media/plus-icon.svg": "static/media/plus-icon.e7b7cbb1.svg",
+  "static/media/sine-icon.svg": "static/media/sine-icon.35d684b0.svg",
+  "static/media/speaker-icon.svg": "static/media/speaker-icon.800e8d0d.svg"
+}
