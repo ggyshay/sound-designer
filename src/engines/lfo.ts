@@ -44,7 +44,6 @@ export class LFO extends BaseEngine {
     }
 
     changeWaveform = (wv: Float32Array) => {
-        console.time('wave');
         const norm = normalizeVector(wv);
         const spectrum = fft(norm);
 
@@ -58,7 +57,6 @@ export class LFO extends BaseEngine {
 
         const wave = this.ctx.createPeriodicWave(real, imag);
         this.input.setPeriodicWave(wave);
-        console.timeEnd('wave')
     }
 }
 
