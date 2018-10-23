@@ -1,4 +1,26 @@
-.App { 
-  width: 100vw;
-  height: 100vh;
+.App {
+    width: 100vw;
+    height: 100vh;
+}
+
+.githubIcon {
+    width: 2em;
+    color: white;
+}
+
+.githubIcon-holder {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    opacity: 0.3;
+    display: inline-block;
+    width: 2.1em;
+    height: 2.1em;
+    padding: 0.1em;
+    background-color: white;
+}
+
+.githubIcon-holder:hover {
+    opacity: 0.8;
+    transition: opacity ease-in-out 300ms;
 }

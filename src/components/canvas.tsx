@@ -2,11 +2,11 @@ import * as React from 'react';
 import { Subscribe } from 'unstated';
 import { Card, ConnectorMeta } from '../atoms';
 import { AudioEngine } from '../atoms/audio-engine';
-import { InputDisplayComponent } from '../atoms/input-display';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { ConnectionProvider } from '../providers/connection.provider';
 import { ComponentMenu } from './component-menu';
 import { EngineComponent } from './engine-component';
+import GithubIC from '../assets/icons/github-icon.svg';
 
 export interface CanvasProps {
     onConnectorDrag: (metadata: any) => void;
@@ -82,6 +82,11 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                             })}
                             <button onClick={() => this.nodeProvider.renewConnections()}>Trigger</button>
                             <ComponentMenu handleDrag={this.handleDragStart} />
+                            <a href="http://ggyshay.github.io/sound-designer/">
+                                <div className="githubIcon-holder">
+                                    <img src={GithubIC} alt="github" className="unselectable githubIcon" />
+                                </div>
+                            </a>
                         </div>
                     )
                 }}
