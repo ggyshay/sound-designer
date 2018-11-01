@@ -19,6 +19,10 @@ export class BaseEngine {
     disconnect(destinationParam: AudioParam, output: number): void;
 
     disconnect(destination?: any, output?: any, input?: any) {
-        this.input.disconnect(destination, output, input);
+        if (!destination) {
+            this.input.disconnect();
+        } else {
+            this.input.disconnect(destination, output, input);
+        }
     }
 }

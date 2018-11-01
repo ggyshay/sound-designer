@@ -54,7 +54,8 @@ export class FixedInputCard extends React.Component<CardComponentProps, any>{
                                 )
                             })}
                             <div className={classname} onMouseDown={this.props.handleCardDrag} id="card-body">
-                                <input className="frequency-input" onChange={this.handleValueChange} value={this.state.value + ' Hz'} />
+                                <input className="frequency-input" onChange={this.handleValueChange}
+                                value={this.state.value + ' Hz'} onFocus={() => this.selectionProvider.cleanSelection()}/>
                             </div>
                         </div>);
                 }}

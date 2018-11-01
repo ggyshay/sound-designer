@@ -56,7 +56,8 @@ export class LFOCard extends React.Component<CardComponentProps, LFOCardState>{
                                 </div>
                                 <div className="card-display"><InputDisplayComponent id={this.props.id} onChange={this.handleWaveChange}/></div>
                                 <div className="lfo-control-pannel">
-                                    <input className="lfo-frequency-input" onChange={e => this.handleFrequencyChange(e.target.value)} value={this.state.frequency + ' Hz'} />
+                                    <input className="lfo-frequency-input" onChange={e => this.handleFrequencyChange(e.target.value)}
+                                    value={this.state.frequency + ' Hz'} onFocus={() => this.selectionProvider.cleanSelection()}/>
                                     <div className="lfo-mode-button">
                                         <div style={{ backgroundColor: (!this.state.modeIsLoop ? Colors.secondary : '') }} onClick={e => this.handleModeChange(false)}>
                                             <img src={oneShotIC} className="unselectable" />

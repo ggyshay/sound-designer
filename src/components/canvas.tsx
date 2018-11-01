@@ -7,6 +7,7 @@ import { ConnectionProvider } from '../providers/connection.provider';
 import { ComponentMenu } from './component-menu';
 import { EngineComponent } from './engine-component';
 import GithubIC from '../assets/icons/github-icon.svg';
+import { SelectionProvider } from 'src/providers/selection.provider';
 
 export interface CanvasProps {
     onConnectorDrag: (metadata: any) => void;
@@ -34,6 +35,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     private ctx: AudioContext;
     private nodeProvider: CardNodeProvider;
     private connectionProvider: ConnectionProvider;
+    private selectionProvider: SelectionProvider;
 
     constructor(props) {
         super(props);
@@ -50,13 +52,16 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         const Outp = this.props.currentConnection.Outp;
         const Inp = this.props.currentConnection.Inp;
         return (
-            <Subscribe to={[CardNodeProvider, ConnectionProvider]}>
-                {(nodeProvider: CardNodeProvider, connectionProvider: ConnectionProvider) => {
+            <Subscribe to={[CardNodeProvider, ConnectionProvider, SelectionProvider]}>
+                {(nodeProvider: CardNodeProvider, connectionProvider: ConnectionProvider, selectionProvider: SelectionProvider) => {
                     this.nodeProvider = nodeProvider
                     this.connectionProvider = connectionProvider;
+                    this.selectionProvider = selectionProvider;
                     return (
                         <div id="canvas" className="App" onDragOver={(e) => this.handleDragOver(e)} onDrop={e => this.handleDrop(e)}
-                            onMouseUp={this.handleMouseUp}>
+                            onMouseUp={this.handleMouseUp}
+                            onClick={this.handleClick}
+                        >
                             {this.nodeProvider.state.nodes.map((n: CardNode) => {
                                 return (<EngineComponent
                                     key={n.id}
@@ -80,7 +85,6 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                                 </EngineComponent>
                                 );
                             })}
-                            <button onClick={() => this.nodeProvider.renewConnections()}>Trigger</button>
                             <ComponentMenu handleDrag={this.handleDragStart} />
                             <a href="http://ggyshay.github.io/sound-designer/">
                                 <div className="githubIcon-holder">
@@ -92,6 +96,12 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 }}
             </Subscribe>
         );
+    }
+
+    handleClick = (e: any) => {
+        if (e.target.id === 'canvas') {
+            this.selectionProvider.cleanSelection()
+        }
     }
 
     handleCardDrag = (e: MouseEvent, id: string) => {

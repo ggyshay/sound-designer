@@ -59,9 +59,9 @@ export class Knob extends React.Component<KnobProps, KnobState> {
                         <path d={this.createArc(300)} stroke={this.props.lineColor || '#202020'} fill="none" strokeWidth="3px" />
                         <path d={this.createArc(this.state.angle)} stroke={this.props.color || '#00DACD'} fill="none" strokeWidth="3px" />
                     </svg>
-                    <p className="value-text">{displayValue}</p>
+                    <p className="value-text unselectable">{displayValue}</p>
                 </div>
-                <p className="label">{this.props.label}</p>
+                <p className="label unselectable">{this.props.label}</p>
             </div>
         )
     }
