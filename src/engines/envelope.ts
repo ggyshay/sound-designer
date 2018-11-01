@@ -32,6 +32,12 @@ export class Envelope extends BaseEngine {
         this.endCB && setTimeout(this.endCB, (time || 0) + attack + decay + release);
     }
 
+    release = () => {
+        const { release } = this.params;
+        this.input.gain.linearRampToValueAtTime(0, this.ctx.currentTime + release + 0.001);
+        this.endCB && setTimeout(this.endCB, release);
+    }
+
     onEnded = fn => {
         this.endCB = fn
     }

@@ -68,7 +68,7 @@ export class Card extends React.Component<CardProps, CardState> {
                 {(cardNodeProvider: CardNodeProvider, selectionProvider: SelectionProvider) => {
                     this.cardNodeProvider = cardNodeProvider;
                     this.selectionProvider = selectionProvider;
-
+                    
                     return (
                         <div className="card-holder" style={{ left: this.props.Position.x, top: this.props.Position.y }}>
                             {this.renderCards()}

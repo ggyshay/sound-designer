@@ -122,17 +122,11 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
         })
     }
 
-    setup = () => {
-        this.engine.setup();
-    }
+    setup = () => this.engine.setup();
 
-    tryStart = (time?: number) => {
-        this.engine.start(time);
-    }
+    tryStart = (time?: number) => this.engine.start(time);
 
-    areConnected = (inCon: ConnectorMeta, outCon: ConnectorMeta) => {
-        return !!outCon.connections.find((cn: ConnectionMeta) => (cn.id === inCon.id));
-    }
+    areConnected = (inCon: ConnectorMeta, outCon: ConnectorMeta) => !!outCon.connections.find((cn: ConnectionMeta) => (cn.id === inCon.id));
 
     createConnectors = () => {
         let connectors = null

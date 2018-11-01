@@ -1,13 +1,15 @@
 import * as React from 'react';
+import { SelectionProvider } from 'src/providers/selection.provider';
 import { Subscribe } from 'unstated';
+import GithubIC from '../assets/icons/github-icon.svg';
 import { Card, ConnectorMeta } from '../atoms';
 import { AudioEngine } from '../atoms/audio-engine';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { ConnectionProvider } from '../providers/connection.provider';
+import { envelopeParams } from './cards';
+import { OscillatorParams } from './cards/oscillator-card';
 import { ComponentMenu } from './component-menu';
 import { EngineComponent } from './engine-component';
-import GithubIC from '../assets/icons/github-icon.svg';
-import { SelectionProvider } from 'src/providers/selection.provider';
 
 export interface CanvasProps {
     onConnectorDrag: (metadata: any) => void;
@@ -47,6 +49,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     componentDidUpdate() { this.updateConnectors() }
+    componentDidMount() { this.createInitialConnections() }
 
     render() {
         const Outp = this.props.currentConnection.Outp;
@@ -167,5 +170,36 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             this.nodeProvider.updateNode(node, node.id);
             this.nodeProvider.renewConnections();
         }
+    }
+
+    createInitialConnections = () => {
+        // connect osc to env
+        const osc = this.nodeProvider.getNodeWithId('Oscillator0')
+        const env = this.nodeProvider.getNodeWithId('Envelope0');
+        const outp = this.nodeProvider.getNodeWithId('Output');
+        const inp  = this.nodeProvider.getNodeWithId('Input');
+
+        let outputConnector = osc.connectors[1];
+        let inputConnector = env.connectors[0];
+        let connections = outputConnector.connections.slice(0);
+        connections.push({ id: inputConnector.id, parentId: inputConnector.parentId });
+        outputConnector.connections = connections;
+        
+        outputConnector = env.connectors[1];
+        inputConnector = outp.connectors[0];
+        connections = outputConnector.connections.slice(0);
+        connections.push({ id: inputConnector.id, parentId: inputConnector.parentId });
+        outputConnector.connections = connections;
+
+        outputConnector = inp.connectors[0];
+        inputConnector = osc.connectors[0];
+        connections = outputConnector.connections.slice(0);
+        connections.push({ id: inputConnector.id, parentId: inputConnector.parentId });
+        outputConnector.connections = connections;
+
+        this.nodeProvider.updateNode(osc, osc.id);
+        this.nodeProvider.updateNode(env, env.id);
+        this.nodeProvider.updateNode(inp, inp.id);
+        this.nodeProvider.renewConnections();
     }
 }

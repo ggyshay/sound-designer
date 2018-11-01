@@ -12,8 +12,22 @@ export class CardNodeProvider extends Container<CardNodeProviderState> {
     constructor() {
         super();
         this.state = {
-            nodes: [{ x: 500, y: 300, id: 'Output', type: 'Output', connectors: [], engine: null, engRef: React.createRef<EngineComponent>()  },
-            { x: 100, y: 300, id: 'Input', type: 'Input', connectors: [], engine: null, engRef: React.createRef<EngineComponent>()  },]
+            nodes: [{
+                x: 1000, y: 300, id: 'Output', type: 'Output', connectors: [], engine: null,
+                engRef: React.createRef<EngineComponent>()
+            },
+            {
+                x: 100, y: 300, id: 'Input', type: 'Input', connectors: [], engine: null,
+                engRef: React.createRef<EngineComponent>()
+            },
+            {
+                x: 300, y: 300, id: 'Oscillator0', type: 'Oscillator', connectors: [], engine: null,
+                engRef: React.createRef<EngineComponent>()
+            },
+            {
+                x: 600, y: 300, id: 'Envelope0', type: 'Envelope', connectors: [], engine: null,
+                engRef: React.createRef<EngineComponent>()
+            },]
         };
     }
 

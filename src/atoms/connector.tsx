@@ -39,12 +39,13 @@ export class Connector extends React.Component<ConnectorProps, any>{
     }
 
     render() {
-        const { dx, dy, x0, y0 } = this.getSVGSize();
         return (
             <Subscribe to={[CardNodeProvider, SelectionProvider]}>
                 {(cardNodeProvider: CardNodeProvider, selectionProvider: SelectionProvider) => {
                     this.cardNodeProvider = cardNodeProvider;
                     this.selectionProvider = selectionProvider;
+                    
+                    const { dx, dy, x0, y0 } = this.getSVGSize();
                     return (
                         <div>
                             <div className="connector"
