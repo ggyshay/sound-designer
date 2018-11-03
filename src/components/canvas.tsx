@@ -6,8 +6,6 @@ import { Card, ConnectorMeta } from '../atoms';
 import { AudioEngine } from '../atoms/audio-engine';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { ConnectionProvider } from '../providers/connection.provider';
-import { envelopeParams } from './cards';
-import { OscillatorParams } from './cards/oscillator-card';
 import { ComponentMenu } from './component-menu';
 import { EngineComponent } from './engine-component';
 
@@ -177,14 +175,14 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         const osc = this.nodeProvider.getNodeWithId('Oscillator0')
         const env = this.nodeProvider.getNodeWithId('Envelope0');
         const outp = this.nodeProvider.getNodeWithId('Output');
-        const inp  = this.nodeProvider.getNodeWithId('Input');
+        const inp = this.nodeProvider.getNodeWithId('Input');
 
         let outputConnector = osc.connectors[1];
         let inputConnector = env.connectors[0];
         let connections = outputConnector.connections.slice(0);
         connections.push({ id: inputConnector.id, parentId: inputConnector.parentId });
         outputConnector.connections = connections;
-        
+
         outputConnector = env.connectors[1];
         inputConnector = outp.connectors[0];
         connections = outputConnector.connections.slice(0);

@@ -1,5 +1,6 @@
 import { BaseEngine } from './'
 import { CardNodeProvider } from 'src/providers/card-node.provider';
+import noteDispatcher from 'src/providers/note-dispatcher';
 
 export class Input extends BaseEngine {
     public input: ConstantSourceNode;
@@ -12,8 +13,10 @@ export class Input extends BaseEngine {
         super();
         this.ctx = ctx;
         this.params = { offset: 440 }
-        document.addEventListener('keydown', e => this.handleKeyPress(e.key))
-        document.addEventListener('keyup', e => this.pressing = false)
+        noteDispatcher.onKeyPress(this.handleKeyPress);
+        noteDispatcher.onMIDIPress(this.handleMIDIPress)
+        noteDispatcher.onMIDIUp(() => this.pressing = false);
+        noteDispatcher.onKeyUp(() => this.pressing = false);
         this.setup();
         this.pressing = false;
     }
@@ -31,6 +34,8 @@ export class Input extends BaseEngine {
     }
 
     changeOffset = off => {
+        console.log('change off', off);
+        
         this.input.offset.value = off;
         this.params.offset = off;
         this.pressing = true;
@@ -39,6 +44,11 @@ export class Input extends BaseEngine {
 
     setNodeProviderRef = nc => {
         this.nodeProvider = nc;
+    }
+
+    handleMIDIPress = f => {
+        this.changeOffset(f);
+        this.pressing = true;
     }
 }
 

@@ -36,7 +36,7 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
         }
         this.engine = new AudioEngine(this.props.ctx, this.props.type);
         this.setup();
-        document.addEventListener('keydown', this.handleKeyDown)
+        document.addEventListener('keydown', this.handleKeyDown);
     }
     componentWillMount() { this.createConnectors(); }
     componentDidUpdate() { if (this.props.connect) this.checkConnect(); }
@@ -69,7 +69,7 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     }
 
     handleKeyDown = e => {
-        if (!(e.key === 'Backspace')) return;
+        if (e.key !== 'Backspace') return;
         if (this.selectionProvider.isNode()) {
             if (this.selectionProvider.state.id === this.props.nodeId) {
                 // remove all connections and try stop engine

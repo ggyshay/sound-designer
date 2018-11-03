@@ -1,4 +1,5 @@
 import { BaseEngine } from "./base-engine";
+import noteDispatcher from "src/providers/note-dispatcher";
 
 export class Envelope extends BaseEngine {
     public input: GainNode;
@@ -10,6 +11,9 @@ export class Envelope extends BaseEngine {
         super();
         this.params = { attack: 0.005, decay: 0.050, sustain: 0.600, release: 0.050 }
         this.ctx = ctx;
+        // document.addEventListener('keyup', this.release)
+        noteDispatcher.onKeyUp(this.release);
+        noteDispatcher.onMIDIUp(this.release)
     }
 
     setup = () => {
@@ -24,16 +28,11 @@ export class Envelope extends BaseEngine {
         this.input.gain.linearRampToValueAtTime(1, (time || this.ctx.currentTime) + attack);
         //sustain
         this.input.gain.exponentialRampToValueAtTime(sustain || 0.0001, (time || this.ctx.currentTime) + attack + decay);
-        //release
-        this.input.gain.exponentialRampToValueAtTime(0.0001, (time || this.ctx.currentTime) + attack + decay + release);
-        this.input.gain.linearRampToValueAtTime(0, (time || this.ctx.currentTime) + attack + decay + release + 0.001);
-
-
-        this.endCB && setTimeout(this.endCB, (time || 0) + attack + decay + release);
     }
 
     release = () => {
         const { release } = this.params;
+        this.input.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + release);
         this.input.gain.linearRampToValueAtTime(0, this.ctx.currentTime + release + 0.001);
         this.endCB && setTimeout(this.endCB, release);
     }

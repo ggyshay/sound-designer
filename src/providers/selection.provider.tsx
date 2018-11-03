@@ -29,7 +29,6 @@ export class SelectionProvider extends Container<SelectionProviderState> {
     }
 
     cleanSelection = () => {
-        console.log('clear');
         
         this.setState({ id: null, destId: null, parentId: null, destParentId: null })
     }
