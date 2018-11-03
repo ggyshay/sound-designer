@@ -110,10 +110,4 @@ class NoteDispatcher {
 
 export default new NoteDispatcher();
 
-export const MIDIToFrequency = (note: number): number => {
-    // let fm = Math.pow(2,(note - 69)/12) * 440
-    const fm = 27.5 * Math.pow(2, (note - 21)/12)
-    console.log(fm, note);
-    
-    return fm;
-}
+export const MIDIToFrequency = (note: number): number => 27.5 * Math.pow(2, (note - 21) / 12);

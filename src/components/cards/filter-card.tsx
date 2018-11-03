@@ -55,7 +55,7 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
                                 <div className="card-header unselectable" onClick={this.props.onCardClick} id="card-header">
                                     <p id="card-header-p">Filter</p>
                                 </div>
-                                <div className="card-display"><DisplayComponent data={this.state.frequencyResponse} id={this.props.id} /></div>
+                                <div className="card-display"><DisplayComponent data={this.state.frequencyResponse} id={this.props.id} logarithmic /></div>
                                 <select className="source-selector" onChange={(e) => this.handleTypeChange(e.target.value)}>
                                     <option value={FilterTypes.LPF}> Low Pass </option>
                                     <option value={FilterTypes.HPF}> High Pass </option>
@@ -88,9 +88,11 @@ export class FilterCard extends React.Component<CardComponentProps, any>{
 
     getFrequencyResponse = () => {
         if (!this.props.getFrequencyResponse) return;
-        let inputFrequencies = new Float32Array(150);
-        for (let i = 0; i < 150; i++) {
-            inputFrequencies[i] = 20000 / 150 * i;
+        const N = 150;
+        const alpha = 3 / N;
+        let inputFrequencies = new Float32Array(N);
+        for (let i = 0; i < N; i++) {
+            inputFrequencies[i] = 20 * Math.pow(10, alpha * i);
         }
         const frequencyResponse = [];
         this.props.getFrequencyResponse(inputFrequencies).forEach((y, i) => {

@@ -34,8 +34,6 @@ export class Input extends BaseEngine {
     }
 
     changeOffset = off => {
-        console.log('change off', off);
-        
         this.input.offset.value = off;
         this.params.offset = off;
         this.pressing = true;

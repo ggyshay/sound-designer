@@ -5,6 +5,7 @@ import _ from 'lodash';
 export interface DisplayComponentProps {
     data: number[];
     id: string;
+    logarithmic?: boolean;
 }
 
 export class DisplayComponent extends React.Component<DisplayComponentProps, any> {
@@ -26,10 +27,16 @@ export class DisplayComponent extends React.Component<DisplayComponentProps, any
         const height = this.node.getBoundingClientRect().height;
         const y = d3.scaleLinear()
             .domain([d3.min(this.props.data, d => d.y), d3.max(this.props.data, d => d.y)]).range([height - 10, 10])
-        const x = d3.scaleLinear()
-            .domain([d3.min(this.props.data, d => d.x), d3.max(this.props.data, d => d.x)]).range([0, width]);
+        const min = d3.min(this.props.data, d => d.x || 0.01);
+        const max = d3.max(this.props.data, d => d.x);
+        const x = this.props.logarithmic ?
+            d3.scaleLog()
+                .domain([min, max])
+                .range([0, width]).base(Math.E) :
+            d3.scaleLinear().domain([d3.min(this.props.data, d => d.x), d3.max(this.props.data, d => d.x)])
+                .range([0, width]);
         const lineGen = d3.line()
-            .x((d) => x(d.x))
+            .x((d) => x(d.x || 0.001))
             .y(d => y(d.y))
         const pathData = lineGen(this.props.data);
 
