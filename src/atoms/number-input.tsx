@@ -18,13 +18,13 @@ export class NumberInput extends React.Component<any, any> {
             <div className="number-input-container">
                 <div style={{ flex: 1 }} />
                 <div style={{ flex: 2 }}>
-                    <button className='number-input-button' onClick={this.increment}>+</button>
+                    <button className='number-input-button unselectable' onClick={this.increment}>+</button>
                 </div>
                 <div style={{ flex: 2 }}>
-                    <input disabled className='number-input-input' value={this.state.value} />
+                    <input disabled className='number-input-input unselectable' value={this.state.value} />
                 </div>
                 <div style={{ flex: 2 }}>
-                    <button className='number-input-button' onClick={this.decrement}>-</button>
+                    <button className='number-input-button unselectable' onClick={this.decrement}>-</button>
                 </div>
                 <div style={{ flex: 1 }} />
             </div>

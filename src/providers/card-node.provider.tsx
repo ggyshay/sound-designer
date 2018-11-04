@@ -63,7 +63,7 @@ export class CardNodeProvider extends Container<CardNodeProviderState> {
         await this.setState({ nodes });
     }
 
-    renewConnections = () => {
+    renewConnections = (timeout?:number) => {
         this.state.nodes.forEach(node => {
             node.engRef.current.setup();
         });
@@ -73,5 +73,10 @@ export class CardNodeProvider extends Container<CardNodeProviderState> {
         this.state.nodes.forEach(node => {
             node.engRef.current.tryStart();
         });
+        if(timeout){
+            this.state.nodes.forEach(node => {
+                setTimeout(() => node.engRef.current.tryStop(), timeout) 
+            })
+        }
     }
 }

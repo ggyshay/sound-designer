@@ -166,7 +166,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             node.connectors[connectorIndex].connections = connections;
             this.connectionProvider.cleanConnection();
             this.nodeProvider.updateNode(node, node.id);
-            this.nodeProvider.renewConnections();
+            this.nodeProvider.renewConnections(500);
         }
     }
 
@@ -198,6 +198,6 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         this.nodeProvider.updateNode(osc, osc.id);
         this.nodeProvider.updateNode(env, env.id);
         this.nodeProvider.updateNode(inp, inp.id);
-        this.nodeProvider.renewConnections();
+        this.nodeProvider.renewConnections(500);
     }
 }

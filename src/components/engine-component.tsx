@@ -5,12 +5,12 @@ import { ConnectionMeta, ConnectorMeta } from '../atoms';
 import { AudioEngine, EngineTypeStrings } from '../atoms/audio-engine';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { ConnectionProvider } from '../providers/connection.provider';
-import { CardNode } from './canvas';
 import { SelectionProvider } from '../providers/selection.provider';
-import { OutputCardParams } from './cards/output-card';
-import { filterParams, envelopeParams } from './cards';
-import { OscillatorParams } from './cards/oscillator-card';
+import { CardNode } from './canvas';
+import { envelopeParams, filterParams } from './cards';
 import { InputCardParams } from './cards/input-card';
+import { OscillatorParams } from './cards/oscillator-card';
+import { OutputCardParams } from './cards/output-card';
 
 
 export interface EngineComponentProps {
@@ -125,6 +125,7 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     setup = () => this.engine.setup();
 
     tryStart = (time?: number) => this.engine.start(time);
+    tryStop = () => this.engine.stop();
 
     areConnected = (inCon: ConnectorMeta, outCon: ConnectorMeta) => !!outCon.connections.find((cn: ConnectionMeta) => (cn.id === inCon.id));
 
@@ -163,7 +164,6 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     }
 
     handleParamChange = (param: string, value: string | number) => {
-        console.log(param, value)
         if (this.engine) {
             this.engine.changeParam(param, value)
         }
