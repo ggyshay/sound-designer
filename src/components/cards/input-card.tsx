@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { NumberInput } from 'src/atoms/number-input';
 import pianoIC from '../../assets/icons/piano-icon.svg';
 import { Connector } from '../../atoms';
 import './cards.css';
@@ -27,8 +28,9 @@ export class InputCard extends React.Component<CardComponentProps>{
                         />
                     )
                 })}
-                <div className="output-card unselectable" onMouseDown={this.props.handleCardDrag} id="card-body">
+                <div className="input-card unselectable" onMouseDown={this.props.handleCardDrag} id="card-body">
                     <img src={pianoIC} className="ignore-mouse" id="card-header" />
+                    <NumberInput onChange={(v) => this.props.onParamChange('semitoneShift', v)} />
                 </div>
             </div>
         );

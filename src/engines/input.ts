@@ -2,17 +2,19 @@ import { BaseEngine } from './'
 import { CardNodeProvider } from 'src/providers/card-node.provider';
 import noteDispatcher from 'src/providers/note-dispatcher';
 
+const semitone = Math.pow(2, 1 / 12);
+
 export class Input extends BaseEngine {
     public input: ConstantSourceNode;
     private ctx: AudioContext;
-    private params: { offset: number }
+    private params: { offset: number, semitoneShift: number }
     private pressing: boolean;
     private nodeProvider: CardNodeProvider;
 
     constructor(ctx) {
         super();
         this.ctx = ctx;
-        this.params = { offset: 440 }
+        this.params = { offset: 440, semitoneShift: 0 }
         noteDispatcher.onKeyPress(this.handleKeyPress);
         noteDispatcher.onMIDIPress(this.handleMIDIPress)
         noteDispatcher.onMIDIUp(() => this.pressing = false);
@@ -34,10 +36,17 @@ export class Input extends BaseEngine {
     }
 
     changeOffset = off => {
-        this.input.offset.value = off;
+        this.input.offset.value = off * Math.pow(semitone, this.params.semitoneShift);
         this.params.offset = off;
         this.pressing = true;
         this.nodeProvider.renewConnections();
+    }
+
+    changeParam = (param: string, value: number|string) => {
+        if(typeof value === 'number'){
+            this.params.semitoneShift = value;
+        }
+        this.changeOffset(this.params.offset);
     }
 
     setNodeProviderRef = nc => {

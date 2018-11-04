@@ -68,7 +68,7 @@ export class Card extends React.Component<CardProps, CardState> {
                 {(cardNodeProvider: CardNodeProvider, selectionProvider: SelectionProvider) => {
                     this.cardNodeProvider = cardNodeProvider;
                     this.selectionProvider = selectionProvider;
-                    
+
                     return (
                         <div className="card-holder" style={{ left: this.props.Position.x, top: this.props.Position.y }}>
                             {this.renderCards()}
@@ -84,7 +84,7 @@ export class Card extends React.Component<CardProps, CardState> {
             case EngineTypeStrings.filter: this.width = 205; this.height = 285; break;
             case EngineTypeStrings.envelope: this.width = 300; this.height = 225; break;
             case EngineTypeStrings.output: this.width = 80; this.height = 80; break;
-            case EngineTypeStrings.input: this.width = 80; this.height = 80; break;
+            case EngineTypeStrings.input: this.width = 120; this.height = 120; break;
             case EngineTypeStrings.oscillator: this.width = 192; this.height = 250; break;
             case EngineTypeStrings.fixedInput: this.width = 143; this.height = 80; break;
             case EngineTypeStrings.LFO: this.width = 300; this.height = 200; break;

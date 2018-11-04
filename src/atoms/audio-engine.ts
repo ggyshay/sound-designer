@@ -127,7 +127,7 @@ export class AudioEngine {
         if (!this.engine) { return }
         if (this.engine instanceof Envelope && typeof value === 'number') {
             this.engine.changeParam(param, value / 1000);
-        } else if (this.engine instanceof Oscillator || this.engine instanceof Filter || this.engine instanceof FixedInput || this.engine instanceof LFO) {
+        } else if (this.engine instanceof Oscillator || this.engine instanceof Filter || this.engine instanceof FixedInput || this.engine instanceof LFO || this.engine instanceof Input) {
             this.engine.changeParam(param, value)
         }
     }

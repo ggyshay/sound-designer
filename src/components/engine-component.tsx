@@ -163,6 +163,7 @@ export class EngineComponent extends React.Component<EngineComponentProps, any> 
     }
 
     handleParamChange = (param: string, value: string | number) => {
+        console.log(param, value)
         if (this.engine) {
             this.engine.changeParam(param, value)
         }
