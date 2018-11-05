@@ -28,7 +28,7 @@ export class FixedInput extends BaseEngine {
     changeOffset = off => {
         this.input.offset.value = off;
         this.params.offset = off;
-        this.nodeProvider.renewConnections();
+        this.nodeProvider.renewConnections(500);
     }
 
     setNodeProviderRef = nc => {
