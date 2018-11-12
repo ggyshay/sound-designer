@@ -1,17 +1,16 @@
+import _ from 'lodash';
 import * as React from 'react';
+import { FixedInputCard } from 'src/components/cards/fixed-input-card';
+import { InputCard } from 'src/components/cards/input-card';
+import { LFOCard } from 'src/components/cards/lfo-card';
+import { Subscribe } from 'unstated';
 import { EnvelopeCard, FilterCard } from '../components/cards';
 import { OscillatorCard } from '../components/cards/oscillator-card';
 import { OutputCard } from '../components/cards/output-card';
-import './card.css';
-import { SelectionProvider } from '../providers/selection.provider';
 import { CardNodeProvider } from '../providers/card-node.provider';
-import { Subscribe } from 'unstated';
-import _ from 'lodash';
-import { InputCard } from 'src/components/cards/input-card';
+import { SelectionProvider } from '../providers/selection.provider';
 import { EngineTypeStrings } from './audio-engine';
-import { FixedInput } from 'src/engines/fixed-input';
-import { FixedInputCard } from 'src/components/cards/fixed-input-card';
-import { LFOCard } from 'src/components/cards/lfo-card';
+import './card.css';
 
 export interface CardProps {
     Position: { x: number, y: number }

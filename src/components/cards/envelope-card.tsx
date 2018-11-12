@@ -4,6 +4,7 @@ import { Connector, DisplayComponent } from '../../atoms';
 import { Knob } from '../../atoms/knob';
 import { SelectionProvider } from '../../providers/selection.provider';
 import { CardComponentProps } from './oscillator-card';
+import { CardHeader } from 'src/atoms/card-header';
 
 export class EnvelopeCard extends React.Component<CardComponentProps, any>{
     private width = 300;
@@ -20,6 +21,7 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
             sustain: 0.6,
             release: 0.05,
             displayValues: [],
+            isMinimized: false,
         }
     }
 
@@ -31,71 +33,80 @@ export class EnvelopeCard extends React.Component<CardComponentProps, any>{
                 (sp: SelectionProvider) => {
                     this.selectionProvider = sp;
                     const classname = 'card' + (this.selectionProvider.isSelected(this.props.id) ? ' selected' : '')
-                    return (
-                        <div>
-                            {this.props.connectors.map(cn => {
-                                return (
-                                    <Connector
-                                        parentX={this.props.Position.x}
-                                        parentY={this.props.Position.y}
-                                        Position={cn.Position}
-                                        id={cn.id}
-                                        parentId={this.props.id}
-                                        isOutp={cn.isOutp}
-                                        onConnectorDetected={this.props.onConnectorDetected}
-                                        onConnectorDrag={this.props.onConnectorDrag}
-                                        onConnectorLost={this.props.onConnectorLost}
-                                        connections={cn.connections}
-                                        key={cn.id}
-                                        type={cn.type}
-                                    />
-                                )
-                            })}
-                            <div className={classname} onMouseDown={this.props.handleCardDrag}
-                                style={{ width: this.width, height: this.height }} id="card-body">
-                                <div className="card-header unselectable" onClick={this.props.onCardClick} id="card-header">
-                                    <p id="card-header-p">Envelope</p>
-                                </div>
-                                <div className="card-display"><DisplayComponent data={this.state.displayValues} id={this.props.id} /></div>
-                                <div className="knob-pannel">
-                                    <Knob
-                                        min={1}
-                                        max={20000}
-                                        value={this.state.attack * 1000}
-                                        onChange={v => this.handleParamChange('attack', v)}
-                                        label='Attack'
-                                        logarithmic
-                                    />
-                                    <Knob
-                                        min={1}
-                                        max={20000}
-                                        value={this.state.decay * 1000}
-                                        onChange={v => this.handleParamChange('decay', v)}
-                                        label="Decay"
-                                        logarithmic
-                                    />
-                                    <Knob
-                                        min={1}
-                                        max={1000}
-                                        value={this.state.sustain * 1000}
-                                        onChange={v => this.handleParamChange('sustain', v)}
-                                        label='Sustain'
-                                    />
-                                    <Knob
-                                        min={1}
-                                        max={20000}
-                                        value={this.state.release * 1000}
-                                        onChange={(v) => this.handleParamChange('release', v)}
-                                        label="Release"
-                                        logarithmic
-                                    />
+                    return this.state.isMinimized ? (
+                        <div style={{ width: this.width, height: this.height }}>
+                            <CardHeader label='Envelope' onMinimizeToggle={this.handleMinimizeToggle}
+                                onCardClick={this.props.onCardClick} isMinimized={this.state.isMinimized} />
+
+                        </div>
+                    ) : (
+                            <div>
+                                {this.props.connectors.map(cn => {
+                                    return (
+                                        <Connector
+                                            parentX={this.props.Position.x}
+                                            parentY={this.props.Position.y}
+                                            Position={cn.Position}
+                                            id={cn.id}
+                                            parentId={this.props.id}
+                                            isOutp={cn.isOutp}
+                                            onConnectorDetected={this.props.onConnectorDetected}
+                                            onConnectorDrag={this.props.onConnectorDrag}
+                                            onConnectorLost={this.props.onConnectorLost}
+                                            connections={cn.connections}
+                                            key={cn.id}
+                                            type={cn.type}
+                                        />
+                                    )
+                                })}
+                                <div className={classname} onMouseDown={this.props.handleCardDrag}
+                                    style={{ width: this.width, height: this.height }} id="card-body">
+                                    <CardHeader label='Envelope' onMinimizeToggle={this.handleMinimizeToggle}
+                                        onCardClick={this.props.onCardClick} isMinimized={this.state.isMinimized} />
+                                    <div className="card-display"><DisplayComponent data={this.state.displayValues} id={this.props.id} /></div>
+                                    <div className="knob-pannel">
+                                        <Knob
+                                            min={1}
+                                            max={20000}
+                                            value={this.state.attack * 1000}
+                                            onChange={v => this.handleParamChange('attack', v)}
+                                            label='Attack'
+                                            logarithmic
+                                        />
+                                        <Knob
+                                            min={1}
+                                            max={20000}
+                                            value={this.state.decay * 1000}
+                                            onChange={v => this.handleParamChange('decay', v)}
+                                            label="Decay"
+                                            logarithmic
+                                        />
+                                        <Knob
+                                            min={1}
+                                            max={1000}
+                                            value={this.state.sustain * 1000}
+                                            onChange={v => this.handleParamChange('sustain', v)}
+                                            label='Sustain'
+                                        />
+                                        <Knob
+                                            min={1}
+                                            max={20000}
+                                            value={this.state.release * 1000}
+                                            onChange={(v) => this.handleParamChange('release', v)}
+                                            label="Release"
+                                            logarithmic
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )
+                        )
                 }}
             </Subscribe>
         );
+    }
+
+    handleMinimizeToggle = () => {
+        this.setState({ isMinimized: !this.state.isMinimized })
     }
 
     createDisplay = () => {
