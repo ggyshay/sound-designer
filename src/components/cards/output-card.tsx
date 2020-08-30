@@ -4,7 +4,14 @@ import { Connector } from '../../atoms';
 import './cards.css';
 import { CardComponentProps } from './oscillator-card';
 
-export class OutputCard extends React.Component<CardComponentProps>{
+export class OutputCard extends React.Component<CardComponentProps, any>{
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            recording: false,
+        }
+    }
 
     render() {
         return (
@@ -27,11 +34,17 @@ export class OutputCard extends React.Component<CardComponentProps>{
                         />
                     )
                 })}
-                <div className="output-card unselectable" onMouseDown={this.props.handleCardDrag} id="card-body">
+                <div className="output-card unselectable" onMouseDown={this.props.handleCardDrag} id="card-body" onClick={this.handleClick}>
                     <img src={speakerIcon} className="ignore-mouse" id="card-header" />
                 </div>
             </div>
         );
+    }
+
+    handleClick = () => {
+        console.log('rolou um clisc aqui');
+        this.props.onParamChange('recording', !this.state.recording?'recording':'stoped');
+        this.setState({ recording: !this.state.recording });
     }
 }
 

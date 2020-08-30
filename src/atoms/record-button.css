@@ -1,0 +1,13 @@
+.record-button-initial {
+    border-radius: 100%;
+    width: 2rem;
+    height: 2rem;
+    background-color: #da0027;
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+}
+
+.record-button-initial:hover{
+    background-color: #8a021b
+}

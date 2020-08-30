@@ -1,5 +1,5 @@
 export class BaseEngine {
-    public input: GainNode | OscillatorNode | BiquadFilterNode | ConstantSourceNode;
+    public input: GainNode | OscillatorNode | BiquadFilterNode | ConstantSourceNode | AudioDestinationNode;
 
     start = (time?: number) => this.input instanceof OscillatorNode && this.input.start(time)
     stop = () => this.input instanceof OscillatorNode && this.input.stop()

@@ -11,27 +11,33 @@ class NoteDispatcher {
         this.MIDIdownCB = [];
         this.MIDIupCB = [];
         document.addEventListener('keypress', e => this.handleKeyDown(e.key))
-        document.addEventListener('keyup', e => this.handleKeyUp(e.key))
+        document.addEventListener('keyup', e => this.handleKeyUp(e.key));
+        const self = this;
         // this.MIDI = navigator.requestMIDIAccess();
         this.MIDI = navigator["requestMIDIAccess"]()
             .then(midiAccess => {
                 // Get lists of available MIDI controllers
                 const inputs = midiAccess.inputs.values();
-
+                
                 const inp = inputs.next().value;
+                
                 inp && (inp.onmidimessage = this.handleMIDIMessage)
 
                 midiAccess.onstatechange = function (e) {
                     const inp = inputs.next().value;
-                    inp && (inp.onmidimessage = this.handleMIDIMessage);
+                    inp && (inp.onmidimessage = self.handleMIDIMessage);
+                    // e.port.onmidimessage = this.handleMIDIMessage;
+                    // e.port.onmidimessage = md => this.handleMIDIMessage(md);
                     // Print information about the (dis)connected MIDI controller
-                    console.log(e.port.name, e.port.manufacturer, e.port.state);
+                    // console.log(e, e.port.name, e.port.manufacturer, e.port.state);
 
                 };
             })
     }
 
     handleMIDIMessage = midiMessage => {
+        // console.log(midiMessage);
+
         const type = midiMessage.data[0];
         const note = midiMessage.data[1];
         const velocity = midiMessage.data[2];
@@ -75,6 +81,7 @@ class NoteDispatcher {
     }
 
     private handleMIDIDown = (note: number) => {
+        
         if (this.playing) return;
         this.playing = note;
         const frequency = MIDIToFrequency(note);

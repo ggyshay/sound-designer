@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SelectionProvider } from 'src/providers/selection.provider';
 import { Subscribe } from 'unstated';
 import GithubIC from '../assets/icons/github-icon.svg';
-import { Card, ConnectorMeta } from '../atoms';
+import { Card, ConnectorMeta, RecordButton } from '../atoms';
 import { AudioEngine } from '../atoms/audio-engine';
 import { CardNodeProvider } from '../providers/card-node.provider';
 import { ConnectionProvider } from '../providers/connection.provider';
@@ -92,6 +92,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                                     <img src={GithubIC} alt="github" className="unselectable githubIcon" />
                                 </div>
                             </a>
+                            <RecordButton ctx={this.ctx}/>
                         </div>
                     )
                 }}
