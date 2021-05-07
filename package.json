@@ -6,7 +6,7 @@
     "@types/dom-mediacapture-record": "^1.0.0",
     "d3": "^5.7.0",
     "fft-js": "0.0.11",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "ractive": "^1.0.0",
     "react": "^16.5.1",
     "react-dom": "^16.5.1",
